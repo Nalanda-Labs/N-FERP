@@ -7,7 +7,7 @@ use ntex::{web, web::App, web::HttpServer};
 use num_cpus;
 
 pub mod config;
-// pub mod how;
+pub mod users;
 pub mod middlewares;
 pub mod state;
 
