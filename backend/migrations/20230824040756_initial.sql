@@ -826,236 +826,781 @@ create table aos_products (
   aos_product_category_id uuid default null
 );
 
-CREATE TABLE aos_products_audit (
+create table aos_products_audit (
   id uuid primary key,
-  parent_id uuid NOT NULL,
-  date_created timestamptz DEFAULT NULL,
-  created_by uuid DEFAULT NULL,
-  field_name varchar(100) DEFAULT NULL,
-  data_type varchar(100) DEFAULT NULL,
-  before_value_string varchar(255) DEFAULT NULL,
-  after_value_string varchar(255) DEFAULT NULL,
-  before_value_text text DEFAULT NULL,
-  after_value_text text DEFAULT NULL
+  parent_id uuid not null,
+  date_created timestamptz default null,
+  created_by uuid default null,
+  field_name varchar(100) default null,
+  data_type varchar(100) default null,
+  before_value_string varchar(255) default null,
+  after_value_string varchar(255) default null,
+  before_value_text text default null,
+  after_value_text text default null
 );
 
 create index idx_aos_products_parent_id on aos_products_audit (parent_id);
 
-CREATE TABLE aos_products_quotes (
+create table aos_products_quotes (
   id uuid primary key,
-  name text DEFAULT NULL,
-  date_entered timestamptz DEFAULT NULL,
-  date_modified timestamptz DEFAULT NULL,
-  modified_user_id uuid DEFAULT NULL,
-  created_by uuid DEFAULT NULL,
-  description text DEFAULT NULL,
-  deleted boolean DEFAULT false,
-  assigned_user_id uuid DEFAULT NULL,
-  currency_id uuid DEFAULT NULL,
-  part_number varchar(255) DEFAULT NULL,
-  item_description text DEFAULT NULL,
-  number int DEFAULT NULL,
-  product_qty decimal(18,4) DEFAULT NULL,
-  product_cost_price decimal(26,6) DEFAULT NULL,
-  product_cost_price_usdollar decimal(26,6) DEFAULT NULL,
-  product_list_price decimal(26,6) DEFAULT NULL,
-  product_list_price_usdollar decimal(26,6) DEFAULT NULL,
-  product_discount decimal(26,6) DEFAULT NULL,
-  product_discount_usdollar decimal(26,6) DEFAULT NULL,
-  product_discount_amount decimal(26,6) DEFAULT NULL,
-  product_discount_amount_usdollar decimal(26,6) DEFAULT NULL,
-  discount varchar(255) DEFAULT 'Percentage',
-  product_unit_price decimal(26,6) DEFAULT NULL,
-  product_unit_price_usdollar decimal(26,6) DEFAULT NULL,
-  vat_amt decimal(26,6) DEFAULT NULL,
-  vat_amt_usdollar decimal(26,6) DEFAULT NULL,
-  product_total_price decimal(26,6) DEFAULT NULL,
-  product_total_price_usdollar decimal(26,6) DEFAULT NULL,
-  vat varchar(100) DEFAULT '5.0',
-  parent_type varchar(100) DEFAULT NULL,
-  parent_id uuid DEFAULT NULL,
-  product_id uuid DEFAULT NULL,
-  group_id uuid DEFAULT NULL
+  name text default null,
+  date_entered timestamptz default null,
+  date_modified timestamptz default null,
+  modified_user_id uuid default null,
+  created_by uuid default null,
+  description text default null,
+  deleted boolean default false,
+  assigned_user_id uuid default null,
+  currency_id uuid default null,
+  part_number varchar(255) default null,
+  item_description text default null,
+  number int default null,
+  product_qty decimal(18,4) default null,
+  product_cost_price decimal(26,6) default null,
+  product_cost_price_usdollar decimal(26,6) default null,
+  product_list_price decimal(26,6) default null,
+  product_list_price_usdollar decimal(26,6) default null,
+  product_discount decimal(26,6) default null,
+  product_discount_usdollar decimal(26,6) default null,
+  product_discount_amount decimal(26,6) default null,
+  product_discount_amount_usdollar decimal(26,6) default null,
+  discount varchar(255) default 'percentage',
+  product_unit_price decimal(26,6) default null,
+  product_unit_price_usdollar decimal(26,6) default null,
+  vat_amt decimal(26,6) default null,
+  vat_amt_usdollar decimal(26,6) default null,
+  product_total_price decimal(26,6) default null,
+  product_total_price_usdollar decimal(26,6) default null,
+  vat varchar(100) default '5.0',
+  parent_type varchar(100) default null,
+  parent_id uuid default null,
+  product_id uuid default null,
+  group_id uuid default null
 );
 
 create index idx_aospq_par_del on aos_products_quotes(parent_id,parent_type,deleted);
 
-CREATE TABLE aos_products_quotes_audit (
+create table aos_products_quotes_audit (
   id uuid primary key,
-  parent_id uuid NOT NULL,
-  date_created timestamptz DEFAULT NULL,
-  created_by uuid DEFAULT NULL,
-  field_name varchar(100) DEFAULT NULL,
-  data_type varchar(100) DEFAULT NULL,
-  before_value_string varchar(255) DEFAULT NULL,
-  after_value_string varchar(255) DEFAULT NULL,
-  before_value_text text DEFAULT NULL,
-  after_value_text text DEFAULT NULL
+  parent_id uuid not null,
+  date_created timestamptz default null,
+  created_by uuid default null,
+  field_name varchar(100) default null,
+  data_type varchar(100) default null,
+  before_value_string varchar(255) default null,
+  after_value_string varchar(255) default null,
+  before_value_text text default null,
+  after_value_text text default null
 );
 
 create index idx_aos_products_quotes_parent_id on aos_products_quotes_audit(parent_id);
 
-CREATE TABLE aos_quotes (
+create table aos_quotes (
   id uuid primary key,
-  name varchar(255) DEFAULT NULL,
-  date_entered timestamptz DEFAULT NULL,
-  date_modified timestamptz DEFAULT NULL,
-  modified_user_id uuid DEFAULT NULL,
-  created_by uuid DEFAULT NULL,
-  description text DEFAULT NULL,
-  deleted boolean DEFAULT false,
-  assigned_user_id uuid DEFAULT NULL,
-  approval_issue text DEFAULT NULL,
-  billing_account_id uuid DEFAULT NULL,
-  billing_contact_id uuid DEFAULT NULL,
-  billing_address_street varchar(150) DEFAULT NULL,
-  billing_address_city varchar(100) DEFAULT NULL,
-  billing_address_state varchar(100) DEFAULT NULL,
-  billing_address_postalcode varchar(20) DEFAULT NULL,
-  billing_address_country varchar(255) DEFAULT NULL,
-  shipping_address_street varchar(150) DEFAULT NULL,
-  shipping_address_city varchar(100) DEFAULT NULL,
-  shipping_address_state varchar(100) DEFAULT NULL,
-  shipping_address_postalcode varchar(20) DEFAULT NULL,
-  shipping_address_country varchar(255) DEFAULT NULL,
-  expiration date DEFAULT NULL,
-  number int DEFAULT NULL,
-  opportunity_id uuid DEFAULT NULL,
-  template_ddown_c text DEFAULT NULL,
-  total_amt decimal(26,6) DEFAULT NULL,
-  total_amt_usdollar decimal(26,6) DEFAULT NULL,
-  subtotal_amount decimal(26,6) DEFAULT NULL,
-  subtotal_amount_usdollar decimal(26,6) DEFAULT NULL,
-  discount_amount decimal(26,6) DEFAULT NULL,
-  discount_amount_usdollar decimal(26,6) DEFAULT NULL,
-  tax_amount decimal(26,6) DEFAULT NULL,
-  tax_amount_usdollar decimal(26,6) DEFAULT NULL,
-  shipping_amount decimal(26,6) DEFAULT NULL,
-  shipping_amount_usdollar decimal(26,6) DEFAULT NULL,
-  shipping_tax varchar(100) DEFAULT NULL,
-  shipping_tax_amt decimal(26,6) DEFAULT NULL,
-  shipping_tax_amt_usdollar decimal(26,6) DEFAULT NULL,
-  total_amount decimal(26,6) DEFAULT NULL,
-  total_amount_usdollar decimal(26,6) DEFAULT NULL,
-  currency_id char(36) DEFAULT NULL,
-  stage varchar(100) DEFAULT 'Draft',
-  term varchar(100) DEFAULT NULL,
-  terms_c text DEFAULT NULL,
-  approval_status varchar(100) DEFAULT NULL,
-  invoice_status varchar(100) DEFAULT 'Not Invoiced',
-  subtotal_tax_amount decimal(26,6) DEFAULT NULL,
-  subtotal_tax_amount_usdollar decimal(26,6) DEFAULT NULL
+  name varchar(255) default null,
+  date_entered timestamptz default null,
+  date_modified timestamptz default null,
+  modified_user_id uuid default null,
+  created_by uuid default null,
+  description text default null,
+  deleted boolean default false,
+  assigned_user_id uuid default null,
+  approval_issue text default null,
+  billing_account_id uuid default null,
+  billing_contact_id uuid default null,
+  billing_address_street varchar(150) default null,
+  billing_address_city varchar(100) default null,
+  billing_address_state varchar(100) default null,
+  billing_address_postalcode varchar(20) default null,
+  billing_address_country varchar(255) default null,
+  shipping_address_street varchar(150) default null,
+  shipping_address_city varchar(100) default null,
+  shipping_address_state varchar(100) default null,
+  shipping_address_postalcode varchar(20) default null,
+  shipping_address_country varchar(255) default null,
+  expiration date default null,
+  number int default null,
+  opportunity_id uuid default null,
+  template_ddown_c text default null,
+  total_amt decimal(26,6) default null,
+  total_amt_usdollar decimal(26,6) default null,
+  subtotal_amount decimal(26,6) default null,
+  subtotal_amount_usdollar decimal(26,6) default null,
+  discount_amount decimal(26,6) default null,
+  discount_amount_usdollar decimal(26,6) default null,
+  tax_amount decimal(26,6) default null,
+  tax_amount_usdollar decimal(26,6) default null,
+  shipping_amount decimal(26,6) default null,
+  shipping_amount_usdollar decimal(26,6) default null,
+  shipping_tax varchar(100) default null,
+  shipping_tax_amt decimal(26,6) default null,
+  shipping_tax_amt_usdollar decimal(26,6) default null,
+  total_amount decimal(26,6) default null,
+  total_amount_usdollar decimal(26,6) default null,
+  currency_id char(36) default null,
+  stage varchar(100) default 'draft',
+  term varchar(100) default null,
+  terms_c text default null,
+  approval_status varchar(100) default null,
+  invoice_status varchar(100) default 'not invoiced',
+  subtotal_tax_amount decimal(26,6) default null,
+  subtotal_tax_amount_usdollar decimal(26,6) default null
 );
 
-CREATE TABLE aos_quotes_aos_invoices_c (
+create table aos_quotes_aos_invoices_c (
   id uuid primary key,
-  date_modified timestamptz DEFAULT NULL,
-  deleted boolean DEFAULT false,
-  aos_quotes77d9_quotes_ida uuid DEFAULT NULL,
-  aos_quotes6b83nvoices_idb uuid DEFAULT NULL
+  date_modified timestamptz default null,
+  deleted boolean default false,
+  aos_quotes77d9_quotes_ida uuid default null,
+  aos_quotes6b83nvoices_idb uuid default null
 );
 
 create index aos_quotes_aos_invoices_alt on aos_quotes_aos_invoices_c(aos_quotes77d9_quotes_ida,aos_quotes6b83nvoices_idb);
 
-CREATE TABLE aos_quotes_audit (
+create table aos_quotes_audit (
   id uuid primary key,
-  parent_id uuid NOT NULL,
-  date_created timestamptz DEFAULT NULL,
-  created_by uuid DEFAULT NULL,
-  field_name varchar(100) DEFAULT NULL,
-  data_type varchar(100) DEFAULT NULL,
-  before_value_string varchar(255) DEFAULT NULL,
-  after_value_string varchar(255) DEFAULT NULL,
-  before_value_text text DEFAULT NULL,
-  after_value_text text DEFAULT NULL
+  parent_id uuid not null,
+  date_created timestamptz default null,
+  created_by uuid default null,
+  field_name varchar(100) default null,
+  data_type varchar(100) default null,
+  before_value_string varchar(255) default null,
+  after_value_string varchar(255) default null,
+  before_value_text text default null,
+  after_value_text text default null
 );
 
 create index idx_aos_quotes_parent_id on aos_quotes_audit(parent_id);
 
-CREATE TABLE aos_quotes_os_contracts_c (
+create table aos_quotes_os_contracts_c (
   id uuid primary key,
-  date_modified timestamptz DEFAULT NULL,
-  deleted boolean DEFAULT false,
-  aos_quotese81e_quotes_ida uuid DEFAULT NULL,
-  aos_quotes4dc0ntracts_idb uuid DEFAULT NULL
+  date_modified timestamptz default null,
+  deleted boolean default false,
+  aos_quotese81e_quotes_ida uuid default null,
+  aos_quotes4dc0ntracts_idb uuid default null
 );
 
 create index aos_quotes_aos_contracts_alt on aos_quotes_os_contracts_c(aos_quotese81e_quotes_ida,aos_quotes4dc0ntracts_idb);
 
-CREATE TABLE aos_quotes_project_c (
+create table aos_quotes_project_c (
   id uuid primary key,
-  date_modified timestamptz DEFAULT NULL,
-  deleted boolean DEFAULT false,
-  aos_quotes1112_quotes_ida uuid DEFAULT NULL,
-  aos_quotes7207project_idb uuid DEFAULT NULL
+  date_modified timestamptz default null,
+  deleted boolean default false,
+  aos_quotes1112_quotes_ida uuid default null,
+  aos_quotes7207project_idb uuid default null
 );
 
 create index aos_quotes_project_alt on aos_quotes_project_c(aos_quotes1112_quotes_ida,aos_quotes7207project_idb);
 
-CREATE TABLE aow_actions (
+create table aow_actions (
   id uuid primary key,
-  name varchar(255) DEFAULT NULL,
-  date_entered timestamptz DEFAULT NULL,
-  date_modified timestamptz DEFAULT NULL,
-  modified_user_id uuid DEFAULT NULL,
-  created_by uuid DEFAULT NULL,
-  description text DEFAULT NULL,
-  deleted boolean DEFAULT false,
-  aow_workflow_id uuid DEFAULT NULL,
-  action_order int(255) DEFAULT NULL,
-  action varchar(100) DEFAULT NULL,
-  parameters longtext DEFAULT NULL
+  name varchar(255) default null,
+  date_entered timestamptz default null,
+  date_modified timestamptz default null,
+  modified_user_id uuid default null,
+  created_by uuid default null,
+  description text default null,
+  deleted boolean default false,
+  aow_workflow_id uuid default null,
+  action_order int(255) default null,
+  action varchar(100) default null,
+  parameters longtext default null
 );
 
 create index aow_action_index_workflow_id on aow_actions(aow_workflow_id);
 
-CREATE TABLE aow_conditions (
+create table aow_conditions (
   id uuid primary key,
-  name varchar(255) DEFAULT NULL,
-  date_entered timestamptz DEFAULT NULL,
-  date_modified timestamptz DEFAULT NULL,
-  modified_user_id uuid DEFAULT NULL,
-  created_by uuid DEFAULT NULL,
-  description text DEFAULT NULL,
-  deleted boolean DEFAULT false,
-  aow_workflow_id uuid DEFAULT NULL,
-  condition_order int DEFAULT NULL,
-  module_path text DEFAULT NULL,
-  field varchar(100) DEFAULT NULL,
-  operator varchar(100) DEFAULT NULL,
-  value_type varchar(255) DEFAULT NULL,
-  value varchar(255) DEFAULT NULL
+  name varchar(255) default null,
+  date_entered timestamptz default null,
+  date_modified timestamptz default null,
+  modified_user_id uuid default null,
+  created_by uuid default null,
+  description text default null,
+  deleted boolean default false,
+  aow_workflow_id uuid default null,
+  condition_order int default null,
+  module_path text default null,
+  field varchar(100) default null,
+  operator varchar(100) default null,
+  value_type varchar(255) default null,
+  value varchar(255) default null
 );
 
 create index aow_conditions_index_workflow_id on aow_conditions(aow_workflow_id);
 
-CREATE TABLE aow_processed (
+create table aow_processed (
   id uuid primary key,
-  name varchar(255) DEFAULT NULL,
-  date_entered timestamptz DEFAULT NULL,
-  date_modified timestamptz DEFAULT NULL,
-  modified_user_id uuid DEFAULT NULL,
-  created_by uuid DEFAULT NULL,
-  description text DEFAULT NULL,
-  deleted boolean DEFAULT false,
-  aow_workflow_id uuid DEFAULT NULL,
-  parent_id uuid DEFAULT NULL,
-  parent_type varchar(100) DEFAULT NULL,
-  status varchar(100) DEFAULT 'Pending'
+  name varchar(255) default null,
+  date_entered timestamptz default null,
+  date_modified timestamptz default null,
+  modified_user_id uuid default null,
+  created_by uuid default null,
+  description text default null,
+  deleted boolean default false,
+  aow_workflow_id uuid default null,
+  parent_id uuid default null,
+  parent_type varchar(100) default null,
+  status varchar(100) default 'pending'
 );
 
 create index aow_processed_index_workflow on aow_processed(aow_workflow_id,status,parent_id,deleted);
 create index aow_processed_index_status on aow_processed(status);
 create index aow_processed_index_workflow_id on aow_processed(aow_workflow_id);
 
-CREATE TABLE aow_processed_aow_actions (
+create table aow_processed_aow_actions (
   id uuid primary key,
-  aow_processed_id uuid DEFAULT NULL,
-  aow_action_id uuid DEFAULT NULL,
-  status varchar(36) DEFAULT 'Pending',
-  date_modified timestamptz DEFAULT NULL,
-  deleted boolean DEFAULT false
+  aow_processed_id uuid default null,
+  aow_action_id uuid default null,
+  status varchar(36) default 'pending',
+  date_modified timestamptz default null,
+  deleted boolean default false
 );
 
 create index idx_aow_processed_aow_actions on aow_processed_aow_actions(aow_processed_id,aow_action_id);
 create index idx_actid_del_freid on aow_processed_aow_actions(aow_action_id,deleted,aow_processed_id);
+
+create table aow_workflow (
+  id uuid primary key,
+  name varchar(255) default null,
+  date_entered timestamptz default null,
+  date_modified timestamptz default null,
+  modified_user_id uuid default null,
+  created_by uuid default null,
+  description text default null,
+  deleted boolean default false,
+  assigned_user_id uuid default null,
+  flow_module varchar(100) default null,
+  flow_run_on varchar(100) default '0',
+  status varchar(100) default 'active',
+  run_when varchar(100) default 'always',
+  multiple_runs boolean default false,
+  run_on_import boolean default false
+);
+
+create index aow_workflow_index_status on aow_workflow(status);
+
+create table aow_workflow_audit (
+  id uuid primary key,
+  parent_id uuid not null,
+  date_created timestamptz default null,
+  created_by uuid default null,
+  field_name varchar(100) default null,
+  data_type varchar(100) default null,
+  before_value_string varchar(255) default null,
+  after_value_string varchar(255) default null,
+  before_value_text text default null,
+  after_value_text text default null
+);
+
+create index idx_aow_workflow_parent_id on aow_workflow_audit(parent_id);
+
+create table bugs (
+  id uuid primary key,
+  name varchar(255) default null,
+  date_entered timestamptz default null,
+  date_modified timestamptz default null,
+  modified_user_id uuid default null,
+  created_by uuid default null,
+  description text default null,
+  deleted boolean default false,
+  assigned_user_id uuid default null,
+  bug_number serial not null,
+  type varchar(255) default null,
+  status varchar(100) default null,
+  priority varchar(100) default null,
+  resolution varchar(255) default null,
+  work_log text default null,
+  found_in_release varchar(255) default null,
+  fixed_in_release varchar(255) default null,
+  source varchar(255) default null,
+  product_category varchar(255) default null
+);
+
+create unique index bugsnumk on bugs(bug_number);
+create index idx_bug_name on bugs(name);
+create index idx_bugs_assigned_user on bugs(assigned_user_id);
+
+create table bugs_audit (
+  id uuid primary key,
+  parent_id uuid not null,
+  date_created timestamptz default null,
+  created_by uuid default null,
+  field_name varchar(100) default null,
+  data_type varchar(100) default null,
+  before_value_string varchar(255) default null,
+  after_value_string varchar(255) default null,
+  before_value_text text default null,
+  after_value_text text default null
+);
+
+create index idx_bugs_parent_id on bugs_audit(parent_id);
+
+create table calls (
+  id uuid primary key,
+  name varchar(50) default null,
+  date_entered timestamptz default null,
+  date_modified timestamptz default null,
+  modified_user_id uuid default null,
+  created_by uuid default null,
+  description text default null,
+  deleted boolean default false,
+  assigned_user_id uuid default null,
+  duration_hours smallint default null,
+  duration_minutes smallint default null,
+  date_start timestamptz default null,
+  date_end timestamptz default null,
+  parent_type varchar(255) default null,
+  status varchar(100) default 'planned',
+  direction varchar(100) default null,
+  parent_id uuid default null,
+  reminder_time int default -1,
+  email_reminder_time int default -1,
+  email_reminder_sent boolean default false,
+  outlook_id varchar(255) default null,
+  repeat_type varchar(36) default null,
+  repeat_interval smallint default 1,
+  repeat_dow varchar(7) default null,
+  repeat_until date default null,
+  repeat_count int default null,
+  repeat_parent_id uuid default null,
+  recurring_source varchar(36) default null
+);
+
+create index idx_call_name on calls(name);
+create index idx_status on calls (status);
+create index idx_calls_date_start on calls(date_start);
+create index idx_calls_par_del on calls(parent_id,parent_type,deleted);
+create index idx_calls_assigned_del on calls(deleted,assigned_user_id);
+
+create table calls_contacts (
+  id uuid primary key,
+  call_id uuid default null,
+  contact_id uuid default null,
+  required varchar(1) default '1',
+  accept_status varchar(25) default 'none',
+  date_modified timestamptz default null,
+  deleted boolean default false
+);
+
+create index idx_con_call_call on calls_contacts(call_id);
+create index idx_con_call_con on calls_contacts (contact_id);
+create index idx_call_contact on calls_contacts(call_id,contact_id);
+
+create table calls_leads (
+  id uuid primary key,
+  call_id uuid default null,
+  lead_id uuid default null,
+  required varchar(1) default '1',
+  accept_status varchar(25) default 'none',
+  date_modified timestamptz default null,
+  deleted boolean default false
+);
+
+create index idx_lead_call_call on calls_leads(call_id);
+create index idx_lead_call_lead on calls_leads(lead_id);
+create index idx_call_lead on calls_leads(call_id,lead_id);
+
+create table calls_reschedule (
+  id uuid primary key,
+  name varchar(255) default null,
+  date_entered timestamptz default null,
+  date_modified timestamptz default null,
+  modified_user_id uuid default null,
+  created_by uuid default null,
+  description text default null,
+  deleted boolean default false,
+  assigned_user_id uuid default null,
+  reason varchar(100) default null,
+  call_id uuid default null
+);
+
+create table calls_reschedule_audit (
+  id uuid primary key,
+  parent_id uuid not null,
+  date_created timestamptz default null,
+  created_by uuid default null,
+  field_name varchar(100) default null,
+  data_type varchar(100) default null,
+  before_value_string varchar(255) default null,
+  after_value_string varchar(255) default null,
+  before_value_text text default null,
+  after_value_text text default null
+);
+
+create index idx_calls_reschedule_parent_id on calls_reschedule_audit(parent_id);
+
+create table calls_users (
+  id uuid primary key,
+  call_id uuid default null,
+  user_id uuid default null,
+  required varchar(1) default '1',
+  accept_status varchar(25) default 'none',
+  date_modified timestamptz default null,
+  deleted boolean default false
+);
+
+create index idx_usr_call_call on calls_users(call_id);
+create index idx_usr_call_usr on calls_users(user_id);
+create index idx_call_users on calls_users(call_id,user_id);
+
+create table campaign_log (
+  id uuid primary key,
+  campaign_id uuid default null,
+  target_tracker_key uuid default null,
+  target_id uuid default null,
+  target_type varchar(100) default null,
+  activity_type varchar(100) default null,
+  activity_date timestamptz default null,
+  related_id uuid default null,
+  related_type varchar(100) default null,
+  archived boolean default false,
+  hits int default 0,
+  list_id uuid default null,
+  deleted boolean default null,
+  date_modified timestamptz default null,
+  more_information varchar(100) default null,
+  marketing_id uuid default null
+);
+
+create index idx_camp_tracker on campaign_log(target_tracker_key);
+create index idx_camp_campaign_id on campaign_log(campaign_id);
+create index idx_camp_more_info on campaign_log(more_information);
+create index idx_target_id on campaign_log(target_id);
+create index idx_target_id_deleted on campaign_log(target_id,deleted);
+
+create table campaign_trkrs (
+  id uuid primary key,
+  tracker_name varchar(255) default null,
+  tracker_url varchar(255) default 'http://',
+  tracker_key serial not null,
+  campaign_id uuid default null,
+  date_entered timestamptz default null,
+  date_modified timestamptz default null,
+  modified_user_id uuid default null,
+  created_by uuid default null,
+  is_optout boolean default false,
+  deleted boolean default false
+);
+
+create index campaign_tracker_key_idx on campaign_trkrs(tracker_key);
+
+create table campaigns (
+  id uuid primary key,
+  name varchar(255) default null,
+  date_entered timestamptz default null,
+  date_modified timestamptz default null,
+  modified_user_id uuid default null,
+  created_by uuid default null,
+  deleted boolean default false,
+  assigned_user_id uuid default null,
+  tracker_key serial not null,
+  tracker_count int default 0,
+  refer_url varchar(255) default 'http://',
+  tracker_text varchar(255) default null,
+  start_date date default null,
+  end_date date default null,
+  status varchar(100) default null,
+  impressions int default 0,
+  currency_id uuid default null,
+  budget double precision default null,
+  expected_cost double precision default null,
+  actual_cost double precision default null,
+  expected_revenue double precision default null,
+  campaign_type varchar(100) default null,
+  objective text default null,
+  content text default null,
+  frequency varchar(100) default null,
+  survey_id uuid default null
+);
+
+create index camp_auto_tracker_key on campaigns(tracker_key);
+create index idx_campaign_name on campaigns(name);
+create index idx_survey_id on campaigns(survey_id);
+
+create table campaigns_audit (
+  id uuid primary key,
+  parent_id uuid not null,
+  date_created timestamptz default null,
+  created_by uuid default null,
+  field_name varchar(100) default null,
+  data_type varchar(100) default null,
+  before_value_string varchar(255) default null,
+  after_value_string varchar(255) default null,
+  before_value_text text default null,
+  after_value_text text default null
+);
+
+create index idx_campaigns_parent_id on campaigns_audit(parent_id);
+
+create table cases (
+  id uuid primary key,
+  name varchar(255) default null,
+  date_entered timestamptz default null,
+  date_modified timestamptz default null,
+  modified_user_id uuid default null,
+  created_by uuid default null,
+  description text default null,
+  deleted boolean default false,
+  assigned_user_id uuid default null,
+  case_number serial not null,
+  type1 varchar(255) default null,
+  status varchar(100) default null,
+  priority varchar(100) default null,
+  resolution text default null,
+  work_log text default null,
+  account_id uuid default null,
+  state varchar(100) default 'open',
+  contact_created_by_id uuid default null
+);
+
+create unique index casesnumk on cases(case_number);
+create index case_number on cases(case_number);
+create index idx_case_name on cases(name);
+create index idx_account_id on cases(account_id);
+create index idx_cases_stat_del on cases(assigned_user_id,status,deleted);
+
+create table cases_audit (
+  id uuid primary key,
+  parent_id uuid not null,
+  date_created timestamptz default null,
+  created_by uuid default null,
+  field_name varchar(100) default null,
+  data_type varchar(100) default null,
+  before_value_string varchar(255) default null,
+  after_value_string varchar(255) default null,
+  before_value_text text default null,
+  after_value_text text default null
+);
+
+create index idx_cases_parent_id on cases_audit(parent_id);
+
+create table cases_bugs (
+  id uuid primary key,
+  case_id uuid default null,
+  bug_id uuid default null,
+  date_modified timestamptz default null,
+  deleted boolean default false
+);
+
+create index idx_cas_bug_cas on cases_bugs(case_id);
+create index idx_cas_bug_bug on cases_bugs(bug_id);
+create index idx_case_bug on cases_bugs(case_id,bug_id);
+
+create table cases_cstm (
+  id_c uuid primary key,
+  jjwg_maps_lng_c float default 0.00000000,
+  jjwg_maps_lat_c float default 0.00000000,
+  jjwg_maps_geocode_status_c varchar(255) default null,
+  jjwg_maps_address_c varchar(255) default null
+);
+
+create table config (
+  category varchar(32) default null,
+  name varchar(32) default null,
+  value text default null
+);
+
+create index idx_config_cat on config(category);
+
+create table contacts (
+  id uuid primary key,
+  date_entered timestamptz default null,
+  date_modified timestamptz default null,
+  modified_user_id uuid default null,
+  created_by uuid default null,
+  description text default null,
+  deleted boolean default false,
+  assigned_user_id uuid default null,
+  salutation varchar(255) default null,
+  first_name varchar(100) default null,
+  last_name varchar(100) default null,
+  title varchar(100) default null,
+  photo varchar(255) default null,
+  department varchar(255) default null,
+  do_not_call boolean default false,
+  phone_home varchar(100) default null,
+  phone_mobile varchar(100) default null,
+  phone_work varchar(100) default null,
+  phone_other varchar(100) default null,
+  phone_fax varchar(100) default null,
+  lawful_basis text default null,
+  date_reviewed date default null,
+  lawful_basis_source varchar(100) default null,
+  primary_address_street varchar(150) default null,
+  primary_address_city varchar(100) default null,
+  primary_address_state varchar(100) default null,
+  primary_address_postalcode varchar(20) default null,
+  primary_address_country varchar(255) default null,
+  alt_address_street varchar(150) default null,
+  alt_address_city varchar(100) default null,
+  alt_address_state varchar(100) default null,
+  alt_address_postalcode varchar(20) default null,
+  alt_address_country varchar(255) default null,
+  assistant varchar(75) default null,
+  assistant_phone varchar(100) default null,
+  lead_source varchar(255) default null,
+  reports_to_id uuid default null,
+  birthdate date default null,
+  campaign_id uuid default null,
+  joomla_account_id varchar(255) default null,
+  portal_account_disabled boolean default null,
+  portal_user_type varchar(100) default 'single'
+);
+
+create index idx_cont_last_first on contacts(last_name,first_name,deleted);
+create index idx_contacts_del_last on contacts(deleted,last_name);
+create index idx_cont_del_reports on contacts(deleted,reports_to_id,last_name);
+create index idx_reports_to_id on contacts(reports_to_id);
+create index idx_del_id_user on contacts(deleted,id,assigned_user_id);
+create index idx_cont_assigned on contacts(assigned_user_id);
+
+create table contacts_audit (
+  id uuid primary key,
+  parent_id uuid not null,
+  date_created timestamptz default null,
+  created_by uuid default null,
+  field_name varchar(100) default null,
+  data_type varchar(100) default null,
+  before_value_string varchar(255) default null,
+  after_value_string varchar(255) default null,
+  before_value_text text default null,
+  after_value_text text default null
+);
+
+create index idx_contacts_parent_id on contacts_audit(parent_id);
+
+create table contacts_bugs (
+  id uuid primary key,
+  contact_id uuid default null,
+  bug_id uuid default null,
+  contact_role varchar(50) default null,
+  date_modified timestamptz default null,
+  deleted boolean default false
+);
+
+create index idx_con_bug_con on contacts_bugs(contact_id);
+create index idx_con_bug_bug on contacts_bugs(bug_id);
+create index idx_contact_bug on contacts_bugs(contact_id,bug_id);
+
+create table contacts_cases (
+  id uuid primary key,
+  contact_id uuid default null,
+  case_id uuid default null,
+  contact_role varchar(50) default null,
+  date_modified timestamptz default null,
+  deleted boolean default false
+);
+
+create index idx_con_case_con on contacts_cases(contact_id);
+create index idx_con_case_case on contacts_cases(case_id);
+create index idx_contacts_cases on contacts_cases(contact_id,case_id);
+
+create table contacts_cstm (
+  id_c uuid primary key,
+  jjwg_maps_lng_c float default 0.00000000,
+  jjwg_maps_lat_c float default 0.00000000,
+  jjwg_maps_geocode_status_c varchar(255) default null,
+  jjwg_maps_address_c varchar(255) default null
+);
+
+create table contacts_users (
+  id uuid primary key,
+  contact_id uuid default null,
+  user_id uuid default null,
+  date_modified timestamptz default null,
+  deleted boolean default false
+);
+
+create index idx_con_users_con on contacts_users(contact_id);
+create index idx_con_users_user on contacts_users(user_id);
+create index idx_contacts_users on contacts_users(contact_id,user_id);
+
+create table cron_remove_documents (
+  id uuid primary key,
+  bean_id uuid default null,
+  module varchar(25) default null,
+  date_modified timestamptz default null
+);
+
+create index idx_cron_remove_document_bean_id on cron_remove_documents(bean_id);
+create index idx_cron_remove_document_stamp on cron_remove_documents(date_modified);
+
+create table currencies (
+  id uuid primary key,
+  name uuid default null,
+  symbol varchar(36) default null,
+  iso4217 varchar(3) default null,
+  conversion_rate double precision default 0,
+  status varchar(100) default null,
+  deleted boolean default null,
+  date_entered timestamptz default null,
+  date_modified timestamptz default null,
+  created_by uuid not null
+);
+
+create index idx_currency_name on currencies(name,deleted);
+
+create table custom_fields (
+  bean_id uuid default null,
+  set_num int default 0,
+  field0 varchar(255) default null,
+  field1 varchar(255) default null,
+  field2 varchar(255) default null,
+  field3 varchar(255) default null,
+  field4 varchar(255) default null,
+  field5 varchar(255) default null,
+  field6 varchar(255) default null,
+  field7 varchar(255) default null,
+  field8 varchar(255) default null,
+  field9 varchar(255) default null,
+  deleted boolean default false
+);
+
+create index idx_beanid_set_num on custom_fields(bean_id,set_num);
+
+create table document_revisions (
+  id uuid primary key,
+  change_log varchar(255) default null,
+  document_id uuid default null,
+  doc_id varchar(100) default null,
+  doc_type varchar(100) default null,
+  doc_url varchar(255) default null,
+  date_entered timestamptz default null,
+  created_by uuid default null,
+  filename varchar(255) default null,
+  file_ext varchar(100) default null,
+  file_mime_type varchar(100) default null,
+  revision varchar(100) default null,
+  deleted boolean default false,
+  date_modified timestamptz default null
+);
+
+create index documentrevision_mimetype on document_revisions(file_mime_type);
+
+create table documents (
+  id uuid primary key,
+  date_entered timestamptz default null,
+  date_modified timestamptz default null,
+  modified_user_id uuid default null,
+  created_by uuid default null,
+  description text default null,
+  deleted boolean default false,
+  assigned_user_id uuid default null,
+  document_name varchar(255) default null,
+  doc_id varchar(100) default null,
+  doc_type varchar(100) default 'sugar',
+  doc_url varchar(255) default null,
+  active_date date default null,
+  exp_date date default null,
+  category_id varchar(100) default null,
+  subcategory_id varchar(100) default null,
+  status_id varchar(100) default null,
+  document_revision_id varchar(36) default null,
+  related_doc_id uuid default null,
+  related_doc_rev_id uuid default null,
+  is_template boolean default false,
+  template_type varchar(100) default null
+);
+
+create index idx_doc_cat on documents(category_id,subcategory_id);
