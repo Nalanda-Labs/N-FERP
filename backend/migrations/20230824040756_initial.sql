@@ -1809,7 +1809,7 @@ create table email_templates (
   type varchar(255) default null
 );
 
-create index idx_te_name on tes(name);
+create index idx_te_name on email_templates(name);
 
 create table emailman (
   id uuid primary key,
@@ -3319,7 +3319,7 @@ create table sugarfeed (
   name varchar(255) default null,
   date_entered timestamptz default null,
   date_modified timestamptz default null,
-  modified_user_id uid default null,
+  modified_user_id uuid default null,
   created_by uuid default null,
   description text default null,
   deleted boolean default false,
@@ -3380,13 +3380,13 @@ create table surveyquestionresponses (
   modified_user_id uuid default null,
   created_by uuid default null,
   description text default null,
-  deleted boolean default fallse,
+  deleted boolean default false,
   assigned_user_id uuid default null,
   answer text default null,
   answer_bool boolean default null,
   answer_datetime timestamptz default null,
   surveyquestion_id uuid default null,
-  surveyresponse_id uiid default null
+  surveyresponse_id uuid default null
 );
 
 create table surveyquestionresponses_audit (
@@ -3431,7 +3431,7 @@ create table surveyquestions_audit (
   after_value_string varchar(255) default null,
   before_value_text text default null,
   after_value_text text default null
-)
+);
 
 create index idx_surveyquestions_parent_id on surveyquestions_audit(parent_id);
 
