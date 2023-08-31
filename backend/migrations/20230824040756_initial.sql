@@ -3592,20 +3592,21 @@ create index idx_userprefnamecat on user_preferences(assigned_user_id,category);
 
 create table users (
   id uuid primary key,
-  user_name varchar(60) default null,
-  user_hash varchar(255) default null,
+  email varchar(255) not null,
+  username varchar(64) not null,
+  password_hash varchar(255) not null,
   system_generated_password boolean default null,
   pwd_last_changed timestamptz default null,
   authenticate_id varchar(100) default null,
   sugar_login boolean default true,
-  first_name varchar(255) default null,
-  last_name varchar(255) default null,
+  first_name varchar(255) default '',
+  last_name varchar(255) default '',
   is_admin boolean default false,
   external_auth_only boolean default false,
   receive_notifications boolean default true,
   description text default null,
-  date_entered timestamptz default null,
-  date_modified timestamptz default null,
+  created_date timestamptz default now(),
+  modified_date timestamptz default now(),
   modified_user_id uuid default null,
   created_by uuid default null,
   title varchar(50) default null,
@@ -3634,6 +3635,8 @@ create table users (
   factor_auth_interface varchar(255) default null
 );
 
+create unique index users_username on users(username);
+create unique index users_email on users(email);
 create index idx_user_name on users(user_name,is_group,status,last_name,first_name,id);
 
 create table users_feeds (
@@ -3693,3 +3696,11 @@ create table vcals (
 );
 
 create index idx_vcal on vcals(type1,user_id);
+
+create table jwt_xsrf (
+  email varchar(255) primary key,
+  username varchar(64) unique not null,
+  xsrf_token uuid not null
+);
+
+create index idx_jwt_xsrf on jwt_xsrf(xsrf_token);

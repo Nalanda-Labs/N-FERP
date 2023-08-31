@@ -22,15 +22,13 @@ type SqlDateTime = chrono::DateTime<Utc>;
 #[derive(Serialize, Deserialize, Debug)]
 pub struct User {
     pub id: Uuid,
-    pub phone: String,
     pub first_name: String,
     pub last_name: String,
+    pub username: String,
     pub email: String,
     // not return password
     #[serde(skip_serializing)]
     pub password_hash: String,
-    pub image_url: String,
-    pub email_verified: bool,
     pub created_date: SqlDateTime,
     pub modified_date: SqlDateTime,
 }
@@ -47,15 +45,4 @@ impl Login {
     pub fn verify(&self, hash: &str) -> bool {
         passhash_verify(&self.password, hash)
     }
-}
-
-#[derive(Debug, Default, Serialize, Deserialize)]
-pub struct Claims {
-    // email
-    pub sub: String,
-    pub exp: usize,
-    pub email: String,
-    pub id: i64,
-    pub xsrf_token: String,
-    pub image_url: String,
 }

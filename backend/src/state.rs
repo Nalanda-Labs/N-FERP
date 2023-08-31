@@ -1,3 +1,7 @@
+pub use mobc_redis::{redis, RedisConnectionManager};
+pub type Connection = mobc::Connection<RedisConnectionManager>;
+pub type KvPool = mobc::Pool<RedisConnectionManager>;
+
 #[cfg(any(feature = "postgres"))]
 pub type SqlPool = sqlx::PgPool;
 #[cfg(any(feature = "postgres"))]
@@ -9,6 +13,7 @@ use crate::config::Config;
 pub struct State {
     pub config: Config,
     pub sql: SqlPool,
+    pub kv: KvPool,
 }
 
 pub type AppStateRaw = std::sync::Arc<State>;

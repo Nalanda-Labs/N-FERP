@@ -1,5 +1,5 @@
 use crate::state::*;
-
+use crate::state::{redis::Client, KvPool, RedisConnectionManager};
 use std::path::PathBuf;
 use std::sync::Arc;
 
@@ -18,12 +18,14 @@ pub struct Config {
     pub host: String,
     pub secret_key: String,
     pub email_verification_expiry_time: u64,
-    pub questions_per_page: i32,
-    pub users_per_page: i32,
-    pub tags_per_page: i64,
-    pub vote_karma_gain: i64,
-    pub vote_karma_loss: i64,
-    pub downvote_karma_loss: i64
+    pub access_token_private_key: String,
+    pub access_token_public_key: String,
+    pub access_token_expiry_time: String,
+    pub access_token_max_age: i64,
+    pub refresh_token_private_key: String,
+    pub refresh_token_public_key: String,
+    pub refresh_token_expiry_time: String,
+    pub refresh_token_max_age: i64,
 }
 
 impl Config {
@@ -39,10 +41,14 @@ impl Config {
         let pool_options = PoolOptions::new();
 
         let sql = pool_options.connect(&self.sql).await.expect("sql open");
+        let kvm =
+            RedisConnectionManager::new(Client::open(self.redis.clone()).expect("redis open"));
+        let kv = KvPool::builder().build(kvm);
 
         Arc::new(State {
             config: self,
             sql,
+            kv,
         })
     }
     // generate and show config string

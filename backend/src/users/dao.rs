@@ -1,6 +1,8 @@
-use super::user::*;
+use async_trait::async_trait;
+use sqlx::Error;
+
+use super::users::*;
 use crate::state::AppStateRaw;
-use md5::compute;
 
 #[async_trait]
 pub trait IUser: std::ops::Deref<Target = AppStateRaw> {
@@ -11,17 +13,22 @@ pub trait IUser: std::ops::Deref<Target = AppStateRaw> {
 #[async_trait]
 impl IUser for &AppStateRaw {
     async fn user_query(&self, email: &str) -> sqlx::Result<User> {
-        let row = sqlx::query!(
-            "SELECT id, first_name, last_name, email, phone, password_hash, email_verified, image_url, created_date
+        let user = sqlx::query_as!(User,
+            "SELECT id, first_name, last_name, username, email, password_hash, created_date, modified_date
             FROM users
-            where email = {};",
+            where email = $1",
             email
         )
-        .fetch_one(&self.sql)
+        .fetch_optional(&self.sql)
         .await?;
 
-        user = User{id.row.id, first_name: row.first_name, last_name: row.last_name, email: row.email, password_hash: row.password_hash, image_url: row.image_url, created_date: row.created_date, modified_date: row.modified_date};
+        let user = match user {
+            Some(user) => user,
+            None => {
+                return Err(Error::RowNotFound);
+            }
+        };
 
-        Ok(User)
+        Ok(user)
     }
 }

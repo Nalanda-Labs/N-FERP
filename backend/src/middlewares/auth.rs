@@ -1,31 +1,47 @@
-use std::time::{SystemTime, UNIX_EPOCH};
-
-use jsonwebtoken::{decode, Algorithm, DecodingKey, Validation};
-use nonblock_logger::error;
+use core::fmt;
+use async_trait::async_trait;
+use futures::executor::block_on;
+use mobc_redis::redis::{AsyncCommands, RedisError};
 use ntex::http::HttpMessage;
-use ntex::util::Ready;
+use std::future::{ready, Ready};
 use ntex::web::{FromRequest, HttpRequest};
 use serde::{Deserialize, Serialize};
 
 use crate::state::AppStateRaw;
-use crate::users::users::Claims;
+use crate::users::token;
+use crate::users::users::User;
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 struct QueryParams {
     access_token: String,
 }
 
+#[derive(Debug, Serialize)]
+struct ErrorResponse {
+    status: String,
+    message: String,
+}
+
+impl fmt::Display for ErrorResponse {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", serde_json::to_string(&self).unwrap())
+    }
+}
+
 #[derive(Debug)]
 pub struct AuthorizationService {
-    pub claims: Claims,
     pub xsrf_token: String,
 }
 
+#[async_trait]
 impl<Err> FromRequest<Err> for AuthorizationService {
     type Error = ntex::web::Error;
-    type Future = Ready<AuthorizationService, Self::Error>;
+    type Future = Ready<Result<AuthorizationService, Self::Error>>;
 
     fn from_request(req: &HttpRequest, _payload: &mut ntex::http::Payload) -> Self::Future {
+        let state = req.app_state::<AppStateRaw>().expect("get AppStateRaw");
+        let key = state.config.jwt_priv.as_bytes();
+
         let xsrf_token_header = req
             .headers()
             .get("X-XSRF-Token")
@@ -33,45 +49,94 @@ impl<Err> FromRequest<Err> for AuthorizationService {
 
         let xsrf_token = match xsrf_token_header {
             Some(x) => x.to_owned(),
-            None => "".to_owned(),
+            None => {
+                return ready(Err(ntex::web::error::ErrorBadRequest("Wrong XSRF token.").into()));
+            }
         };
 
-        let token = match req.cookie("jwt") {
+        let access_token = match req.cookie("access_token") {
             Some(c) => c.to_string(),
-            None => "".to_owned(),
+            None => {
+                return ready(Err(ntex::web::error::ErrorBadRequest("Wrong XSRF token.").into()));
+            }
         };
 
-        let state = req.app_state::<AppStateRaw>().expect("get AppStateRaw");
-        let key = state.config.jwt_priv.as_bytes();
-
-        match decode::<Claims>(
-            &token,
-            &DecodingKey::from_secret(key),
-            &Validation::new(Algorithm::HS256),
+        let access_token_details = match token::verify_jwt_token(
+            state.config.access_token_public_key.to_owned(),
+            &access_token,
         ) {
-            Ok(claims) => {
-                if claims.claims.xsrf_token != xsrf_token {
-                    Ready::Err(ntex::web::error::ErrorUnauthorized("Mismatched tokens.").into())
-                } else {
-                    let start = SystemTime::now()
-                        .duration_since(UNIX_EPOCH)
-                        .unwrap()
-                        .as_secs() as usize;
+            Ok(token_details) => token_details,
+            Err(_) => {
+                return ready(Err(ntex::web::error::ErrorUnauthorized("Unauthorized.").into()));
+            }
+        };
 
-                    if claims.claims.exp < start {
-                        Ready::Err(ntex::web::error::ErrorUnauthorized("JWT has expired").into())
-                    } else {
-                        Ready::Ok(AuthorizationService {
-                            claims: claims.claims,
-                            xsrf_token: xsrf_token,
-                        })
-                    }
+        let access_token_uuid =
+            uuid::Uuid::parse_str(&access_token_details.token_uuid.to_string()).unwrap();
+        
+        if xsrf_token != access_token_uuid.clone().to_string() {
+            return ready(Err(ntex::web::error::ErrorBadRequest("Wrong XSRF token.").into()));
+        }
+
+        let user_id_redis_result = async move {
+            let mut redis_client = match state.kv.get().await {
+                Ok(redis_client) => redis_client,
+                Err(e) => {
+                    return Err(ntex::web::error::ErrorInternalServerError(ErrorResponse {
+                        status: "fail".to_string(),
+                        message: format!("Could not connect to Redis: {}", e),
+                    }));
+                }
+            };
+
+            match redis_client
+                .get::<_, String>(access_token_uuid.clone().to_string())
+                .await
+            {
+                Ok(value) => Ok(value),
+                Err(e) => Err(ntex::web::error::ErrorUnauthorized(ErrorResponse {
+                    status: "fail".to_string(),
+                    message: format!("Token is invalid or session has expired: {:?}", e),
+                })),
+            }
+        };
+
+        let user_exists_result = async move {
+            let user_id = user_id_redis_result.await?;
+
+            let query_result =
+                sqlx::query_as!(User, 
+                    "SELECT id, first_name, last_name, username, email, password_hash, created_date, modified_date FROM users WHERE id = $1",
+                    uuid::Uuid::parse_str(&user_id).unwrap()
+                )
+                .fetch_optional(&state.sql)
+                .await;
+
+            match query_result {
+                Ok(Some(user)) => Ok(user),
+                Ok(None) => {
+                    let json_error = ErrorResponse {
+                        status: "fail".to_string(),
+                        message: "the user belonging to this token no logger exists".to_string(),
+                    };
+                    Err(ntex::web::error::ErrorUnauthorized(json_error))
+                }
+                Err(e) => {
+                    let json_error = ErrorResponse {
+                        status: "error".to_string(),
+                        message: format!("Faled to check user existence: {:?}", e),
+                    };
+                    Err(ntex::web::error::ErrorInternalServerError(json_error))
                 }
             }
-            Err(e) => {
-                error!("jwt.decode {} failed: {:?}", token, e);
-                Ready::Err(ntex::web::error::ErrorBadRequest("Decoding failed.").into())
-            }
+        };
+
+        match block_on(user_exists_result) {
+            Ok(_user) => ready(Ok(AuthorizationService {
+                xsrf_token: access_token_uuid.to_string(),
+            })),
+            Err(e) => ready(Err(e.into()
+            ))
         }
     }
 }
