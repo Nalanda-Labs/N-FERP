@@ -1,7 +1,7 @@
 use core::fmt;
 use async_trait::async_trait;
 use futures::executor::block_on;
-use mobc_redis::redis::{AsyncCommands, RedisError};
+use mobc_redis::redis::AsyncCommands;
 use ntex::http::HttpMessage;
 use std::future::{ready, Ready};
 use ntex::web::{FromRequest, HttpRequest};
@@ -40,7 +40,6 @@ impl<Err> FromRequest<Err> for AuthorizationService {
 
     fn from_request(req: &HttpRequest, _payload: &mut ntex::http::Payload) -> Self::Future {
         let state = req.app_state::<AppStateRaw>().expect("get AppStateRaw");
-        let key = state.config.jwt_priv.as_bytes();
 
         let xsrf_token_header = req
             .headers()

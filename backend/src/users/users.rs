@@ -1,17 +1,7 @@
-use argon2::{self, Config};
+use argon2;
 use chrono::Utc;
-use rand::Rng;
-use ring::digest;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
-
-fn passhash(email: &str, pass: &str) -> String {
-    let config = Config::default();
-    const CREDENTIAL_LEN: usize = digest::SHA256_OUTPUT_LEN;
-    let salt = rand::thread_rng().gen::<[u8; CREDENTIAL_LEN]>();
-    let hash = argon2::hash_encoded(pass.as_bytes(), &salt, &config).unwrap();
-    hash
-}
 
 fn passhash_verify(pass: &str, hash: &str) -> bool {
     argon2::verify_encoded(&hash, pass.as_bytes()).unwrap()

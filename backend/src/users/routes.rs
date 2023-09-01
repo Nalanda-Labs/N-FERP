@@ -3,10 +3,8 @@ use super::users::*;
 use crate::middlewares::auth;
 use crate::state::AppState;
 use crate::users::token;
-use chrono::{DateTime, Utc};
 use cookie::time::Duration;
 use cookie::Cookie;
-use jsonwebtoken::{encode, EncodingKey, Header};
 use mobc_redis::redis::{self, AsyncCommands};
 use nonblock_logger::{debug, info};
 use ntex::http::HttpMessage;
@@ -303,4 +301,10 @@ async fn logout_handler(
         .cookie(refresh_cookie)
         .cookie(logged_in_cookie)
         .json(&serde_json::json!({"status": "success"}))
+}
+
+pub fn init(cfg: &mut web::ServiceConfig) {
+    cfg.service(login);
+    cfg.service(refresh_access_token_handler);
+    cfg.service(logout_handler);
 }
