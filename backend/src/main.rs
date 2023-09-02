@@ -1,15 +1,16 @@
 extern crate nonblock_logger;
-extern crate validator;
-extern crate sqlx;
 extern crate serde;
+extern crate sqlx;
+extern crate validator;
 
 use ntex::{web, web::App, web::HttpServer};
 use num_cpus;
 
+// pub mod accounts;
 pub mod config;
-pub mod users;
 pub mod middlewares;
 pub mod state;
+pub mod users;
 
 use config::{Config, Opts};
 
@@ -27,7 +28,8 @@ async fn main() -> std::io::Result<()> {
             // we will not be sending JSON data of more than 10KB so compression is not used
             .wrap(web::middleware::Logger::default())
             .service(web::scope(apiv1).configure(users::routes::init))
-    }).workers(num_cpus::get())
+    })
+    .workers(num_cpus::get())
     .keep_alive(300)
     .bind(&state2.config.listen)?
     .run()

@@ -1,9 +1,9 @@
 -- add migration script here
 create table accounts (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   name varchar(150) default null,
-  date_entered timestamptz default null,
-  date_modified timestamptz default null,
+  created_date timestamptz default null,
+  modified_date timestamptz default null,
   modified_user_id uuid default null,
   created_by uuid default null,
   description text default null,
@@ -41,7 +41,7 @@ create index idx_accnt_assigned_del on accounts(deleted, assigned_user_id);
 create index idx_accnt_parent_id on accounts(parent_id);
 
 create table accounts_audit (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   parent_id uuid not null,
   date_created timestamptz default null,
   created_by uuid default null,
@@ -56,10 +56,10 @@ create table accounts_audit (
 create index idx_accounts_parent_id on accounts_audit(parent_id);
 
 create table accounts_bugs (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   account_id uuid default null,
   bug_id uuid default null,
-  date_modified timestamptz default null,
+  modified_date timestamptz default null,
   deleted boolean default false
 );
 
@@ -68,10 +68,10 @@ create index idx_acc_bug_bug on accounts_bugs(bug_id);
 create index idx_account_bug on accounts_bugs(account_id, bug_id);
 
 create table accounts_cases (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   account_id uuid default null,
   case_id uuid default null,
-  date_modified timestamptz default null,
+  modified_date timestamptz default null,
   deleted boolean default false
 );
 
@@ -79,10 +79,10 @@ create index idx_acc_case_acc on accounts_cases(account_id);
 create index idx_acc_acc_case on accounts_cases(case_id);
 
 create table accounts_contacts (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   contact_id uuid default null,
   account_id uuid default null,
-  date_modified timestamptz default null,
+  modified_date timestamptz default null,
   deleted boolean default null
 );
 
@@ -98,10 +98,10 @@ create table accounts_cstm (
 );
 
 create table accounts_opportunities (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   opportunity_id uuid default null,
   account_id uuid default null,
-  date_modified timestamptz default null,
+  modified_date timestamptz default null,
   deleted boolean default false
 );
 
@@ -109,9 +109,9 @@ create index idx_account_opportunity on accounts_opportunities(account_id, oppor
 create index idx_oppid_del_accid on accounts_opportunities(opportunity_id, deleted, account_id);
 
 create table acl_actions (
-  id uuid primary key,
-  date_entered timestamptz default null,
-  date_modified timestamptz default null,
+  id uuid primary key default gen_random_uuid(),
+  created_date timestamptz default null,
+  modified_date timestamptz default null,
   modified_user_id uuid default null,
   created_by uuid default null,
   name varchar(150) default null,
@@ -125,9 +125,9 @@ create index idx_aclaction_id_del on acl_actions(id, deleted);
 create index idx_category_name on acl_actions(category, name);
 
 create table acl_roles (
-  id uuid primary key,
-  date_entered timestamptz default null,
-  date_modified timestamptz default null,
+  id uuid primary key default gen_random_uuid(),
+  created_date timestamptz default null,
+  modified_date timestamptz default null,
   modified_user_id uuid default null,
   created_by uuid default null,
   name varchar(150) default null,
@@ -138,11 +138,11 @@ create table acl_roles (
 create index idx_aclrole_id_del on acl_roles(id, deleted);
 
 create table acl_roles_actions (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   role_id uuid default null,
   action_id uuid default null,
   access_override smallint default null,
-  date_modified timestamptz default null,
+  modified_date timestamptz default null,
   deleted boolean default false
 );
 
@@ -151,10 +151,10 @@ create index idx_acl_action_id on acl_roles_actions(action_id);
 create index idx_aclrole_action on acl_roles_actions(role_id, action_id);
 
 create table acl_roles_users (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   role_id uuid default null,
   user_id uuid default null,
-  date_modified timestamptz default null,
+  modified_date timestamptz default null,
   deleted boolean default false
 );
 
@@ -171,10 +171,10 @@ create table address_book (
 create index ab_user_bean_idx on address_book(assigned_user_id, bean);
 
 create table alerts (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   name varchar(255) default null,
-  date_entered timestamptz default null,
-  date_modified timestamptz default null,
+  created_date timestamptz default null,
+  modified_date timestamptz default null,
   modified_user_id uuid default null,
   created_by uuid default null,
   description text default null,
@@ -190,10 +190,10 @@ create table alerts (
 );
 
 create table am_projecttemplates (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   name varchar(255) default null,
-  date_entered timestamptz default null,
-  date_modified timestamptz default null,
+  created_date timestamptz default null,
+  modified_date timestamptz default null,
   modified_user_id uuid default null,
   created_by uuid default null,
   description text default null,
@@ -205,7 +205,7 @@ create table am_projecttemplates (
 );
 
 create table am_projecttemplates_audit (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   parent_id uuid not null,
   date_created timestamptz default null,
   created_by uuid default null,
@@ -220,8 +220,8 @@ create table am_projecttemplates_audit (
 create index idx_am_projecttemplates_parent_id on am_projecttemplates_audit(parent_id);
 
 create table am_projecttemplates_contacts_1_c (
-  id uuid primary key,
-  date_modified timestamptz default null,
+  id uuid primary key default gen_random_uuid(),
+  modified_date timestamptz default null,
   deleted boolean default false,
   am_projecttemplates_ida uuid default null,
   contacts_idb uuid default null
@@ -230,8 +230,8 @@ create table am_projecttemplates_contacts_1_c (
 create index am_projecttemplates_contacts_1_alt on am_projecttemplates_contacts_1_c(am_projecttemplates_ida, contacts_idb);
 
 create table am_projecttemplates_project_1_c (
-  id uuid primary key,
-  date_modified timestamptz default null,
+  id uuid primary key default gen_random_uuid(),
+  modified_date timestamptz default null,
   deleted boolean default false,
   am_projecttemplates_project_1am_projecttemplates_ida uuid default null,
   am_projecttemplates_project_1project_idb uuid default null
@@ -243,8 +243,8 @@ create index am_projecttemplates_project_1_ida1 on am_projecttemplates_project_1
 create index am_projecttemplates_project_1_alt on am_projecttemplates_project_1_c(am_projecttemplates_project_1project_idb);
 
 create table am_projecttemplates_users_1_c (
-  id uuid primary key,
-  date_modified timestamptz default null,
+  id uuid primary key default gen_random_uuid(),
+  modified_date timestamptz default null,
   deleted boolean default false,
   am_projecttemplates_ida uuid default null,
   users_idb uuid default null
@@ -253,10 +253,10 @@ create table am_projecttemplates_users_1_c (
 create index am_projecttemplates_users_1_alt on am_projecttemplates_users_1_c(am_projecttemplates_ida, users_idb);
 
 create table am_tasktemplates (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   name varchar(255) default null,
-  date_entered timestamptz default null,
-  date_modified timestamptz default null,
+  created_date timestamptz default null,
+  modified_date timestamptz default null,
   modified_user_id uuid default null,
   created_by uuid default null,
   description text default null,
@@ -276,8 +276,8 @@ create table am_tasktemplates (
 );
 
 create table am_tasktemplates_am_projecttemplates_c (
-  id uuid primary key,
-  date_modified timestamptz default null,
+  id uuid primary key default gen_random_uuid(),
+  modified_date timestamptz default null,
   deleted boolean default false,
   am_tasktemplates_am_projecttemplatesam_projecttemplates_ida uuid default null,
   am_tasktemplates_am_projecttemplatesam_tasktemplates_idb uuid default null
@@ -291,7 +291,7 @@ create index am_tasktemplates_am_projecttemplates_alt on am_tasktemplates_am_pro
 );
 
 create table am_tasktemplates_audit (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   parent_id uuid not null,
   date_created timestamptz default null,
   created_by uuid default null,
@@ -306,10 +306,10 @@ create table am_tasktemplates_audit (
 create index idx_am_tasktemplates_parent_id on am_projecttemplates_audit(parent_id);
 
 create table aobh_businesshours (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   name varchar(255) default null,
-  date_entered timestamptz default null,
-  date_modified timestamptz default null,
+  created_date timestamptz default null,
+  modified_date timestamptz default null,
   modified_user_id uuid default null,
   created_by uuid default null,
   description text default null,
@@ -321,10 +321,10 @@ create table aobh_businesshours (
 );
 
 create table aok_knowledge_base_categories (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   name varchar(255) default null,
-  date_entered timestamptz default null,
-  date_modified timestamptz default null,
+  created_date timestamptz default null,
+  modified_date timestamptz default null,
   modified_user_id uuid default null,
   created_by uuid default null,
   description text default null,
@@ -333,7 +333,7 @@ create table aok_knowledge_base_categories (
 );
 
 create table aok_knowledge_base_categories_audit (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   parent_id uuid not null,
   date_created timestamptz default null,
   created_by uuid default null,
@@ -348,10 +348,10 @@ create table aok_knowledge_base_categories_audit (
 create index idx_aok_knowledge_base_categories_parent_id on aok_knowledge_base_categories_audit(parent_id);
 
 create table aok_knowledgebase (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   name varchar(255) default null,
-  date_entered timestamptz default null,
-  date_modified timestamptz default null,
+  created_date timestamptz default null,
+  modified_date timestamptz default null,
   modified_user_id uuid default null,
   created_by uuid default null,
   description text default null,
@@ -365,7 +365,7 @@ create table aok_knowledgebase (
 );
 
 create table aok_knowledgebase_audit (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   parent_id uuid not null,
   date_created timestamptz default null,
   created_by uuid default null,
@@ -380,8 +380,8 @@ create table aok_knowledgebase_audit (
 create index idx_aok_knowledgebase_parent_id on aok_knowledgebase_audit(parent_id);
 
 create table aok_knowledgebase_categories (
-  id uuid primary key,
-  date_modified timestamptz default null,
+  id uuid primary key default gen_random_uuid(),
+  modified_date timestamptz default null,
   deleted boolean default false,
   aok_knowledgebase_id uuid default null,
   aok_knowledge_base_categories_id uuid default null
@@ -390,10 +390,10 @@ create table aok_knowledgebase_categories (
 create index aok_knowledgebase_categories_alt on aok_knowledgebase_categories(aok_knowledgebase_id,aok_knowledge_base_categories_id);
 
 create table aop_case_events (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   name varchar(255) default null,
-  date_entered timestamptz default null,
-  date_modified timestamptz default null,
+  created_date timestamptz default null,
+  modified_date timestamptz default null,
   modified_user_id uuid default null,
   created_by uuid default null,
   description text default null,
@@ -403,7 +403,7 @@ create table aop_case_events (
 );
 
 create table aop_case_events_audit (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   parent_id uuid not null,
   date_created timestamptz default null,
   created_by uuid default null,
@@ -418,10 +418,10 @@ create table aop_case_events_audit (
 create index idx_aop_case_events_parent_id on aop_case_events_audit(parent_id);
 
 create table aop_case_updates (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   name varchar(255) default null,
-  date_entered timestamptz default null,
-  date_modified timestamptz default null,
+  created_date timestamptz default null,
+  modified_date timestamptz default null,
   modified_user_id uuid default null,
   created_by uuid default null,
   description text default null,
@@ -433,7 +433,7 @@ create table aop_case_updates (
 );
 
 create table aop_case_updates_audit (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   parent_id uuid not null,
   date_created timestamptz default null,
   created_by uuid default null,
@@ -448,10 +448,10 @@ create table aop_case_updates_audit (
 create index idx_aop_case_updates_parent_id on aop_case_updates_audit(parent_id);
 
 create table aor_charts (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   name varchar(255) default null,
-  date_entered timestamptz default null,
-  date_modified timestamptz default null,
+  created_date timestamptz default null,
+  modified_date timestamptz default null,
   modified_user_id uuid default null,
   created_by uuid default null,
   description text default null,
@@ -463,10 +463,10 @@ create table aor_charts (
 );
 
 create table aor_conditions (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   name varchar(255) default null,
-  date_entered timestamptz default null,
-  date_modified timestamptz default null,
+  created_date timestamptz default null,
+  modified_date timestamptz default null,
   modified_user_id uuid default null,
   created_by uuid default null,
   description text default null,
@@ -486,10 +486,10 @@ create table aor_conditions (
 create index aor_conditions_index_report_id on aor_conditions(aor_report_id);
 
 create table aor_fields (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   name varchar(255) default null,
-  date_entered timestamptz default null,
-  date_modified timestamptz default null,
+  created_date timestamptz default null,
+  modified_date timestamptz default null,
   modified_user_id uuid default null,
   created_by uuid default null,
   description text default null,
@@ -514,10 +514,10 @@ create table aor_fields (
 create index aor_fields_index_report_id on aor_fields(aor_report_id);
 
 create table aor_reports (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   name varchar(255) default null,
-  date_entered timestamptz default null,
-  date_modified timestamptz default null,
+  created_date timestamptz default null,
+  modified_date timestamptz default null,
   modified_user_id uuid default null,
   created_by uuid default null,
   description text default null,
@@ -528,7 +528,7 @@ create table aor_reports (
 );
 
 create table aor_reports_audit (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   parent_id uuid not null,
   date_created timestamptz default null,
   created_by uuid default null,
@@ -543,10 +543,10 @@ create table aor_reports_audit (
 create index idx_aor_reports_parent_id on aor_reports_audit(parent_id);
 
 create table aor_scheduled_reports (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   name varchar(255) default null,
-  date_entered timestamptz default null,
-  date_modified timestamptz default null,
+  created_date timestamptz default null,
+  modified_date timestamptz default null,
   modified_user_id uuid default null,
   created_by uuid default null,
   description text default null,
@@ -559,10 +559,10 @@ create table aor_scheduled_reports (
 );
 
 create table aos_contracts (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   name varchar(255) default null,
-  date_entered timestamptz default null,
-  date_modified timestamptz default null,
+  created_date timestamptz default null,
+  modified_date timestamptz default null,
   modified_user_id uuid default null,
   created_by uuid default null,
   description text default null,
@@ -601,7 +601,7 @@ create table aos_contracts (
 );
 
 create table aos_contracts_audit (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   parent_id uuid not null,
   date_created timestamptz default null,
   created_by uuid default null,
@@ -616,8 +616,8 @@ create table aos_contracts_audit (
 create index idx_aos_contracts_parent_id on aos_contracts_audit(parent_id);
 
 create table aos_contracts_documents (
-  id uuid primary key,
-  date_modified timestamptz default null,
+  id uuid primary key default gen_random_uuid(),
+  modified_date timestamptz default null,
   deleted boolean default false,
   aos_contracts_id uuid default null,
   documents_id uuid default null,
@@ -627,10 +627,10 @@ create table aos_contracts_documents (
 create index aos_contracts_documents_alt on aos_contracts_documents(aos_contracts_id,documents_id);
 
 create table aos_invoices (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   name varchar(255) default null,
-  date_entered timestamptz default null,
-  date_modified timestamptz default null,
+  created_date timestamptz default null,
+  modified_date timestamptz default null,
   modified_user_id uuid default null,
   created_by uuid default null,
   description text default null,
@@ -676,7 +676,7 @@ create table aos_invoices (
 );
 
 create table aos_invoices_audit (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   parent_id uuid not null,
   date_created timestamptz default null,
   created_by uuid default null,
@@ -691,10 +691,10 @@ create table aos_invoices_audit (
 create index idx_aos_invoices_parent_id on aos_invoices_audit(parent_id);
 
 create table aos_line_item_groups (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   name varchar(255) default null,
-  date_entered timestamptz default null,
-  date_modified timestamptz default null,
+  created_date timestamptz default null,
+  modified_date timestamptz default null,
   modified_user_id uuid default null,
   created_by uuid default null,
   description text default null,
@@ -719,7 +719,7 @@ create table aos_line_item_groups (
 );
 
 create table aos_line_item_groups_audit (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   parent_id uuid not null,
   date_created timestamptz default null,
   created_by uuid default null,
@@ -734,10 +734,10 @@ create table aos_line_item_groups_audit (
 create index idx_aos_line_item_groups_parent_id on aos_line_item_groups_audit(parent_id);
 
 create table aos_pdf_templates (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   name varchar(255) default null,
-  date_entered timestamptz default null,
-  date_modified timestamptz default null,
+  created_date timestamptz default null,
+  modified_date timestamptz default null,
   modified_user_id uuid default null,
   created_by uuid default null,
   description text default null,
@@ -758,7 +758,7 @@ create table aos_pdf_templates (
 );
 
 create table aos_pdf_templates_audit (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   parent_id uuid not null,
   date_created timestamptz default null,
   created_by uuid default null,
@@ -773,10 +773,10 @@ create table aos_pdf_templates_audit (
 create index idx_aos_pdf_templates_parent_id on aos_pdf_templates_audit(parent_id);
 
 create table aos_product_categories (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   name varchar(255) default null,
-  date_entered timestamptz default null,
-  date_modified timestamptz default null,
+  created_date timestamptz default null,
+  modified_date timestamptz default null,
   modified_user_id uuid default null,
   created_by uuid default null,
   description text default null,
@@ -787,7 +787,7 @@ create table aos_product_categories (
 );
 
 create table aos_product_categories_audit (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   parent_id uuid not null,
   date_created timestamptz default null,
   created_by varchar(36) default null,
@@ -802,10 +802,10 @@ create table aos_product_categories_audit (
 create index idx_aos_product_categories_parent_id on aos_product_categories_audit(parent_id);
 
 create table aos_products (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   name varchar(255) default null,
-  date_entered timestamptz default null,
-  date_modified timestamptz default null,
+  created_date timestamptz default null,
+  modified_date timestamptz default null,
   modified_user_id uuid default null,
   created_by uuid default null,
   description text default null,
@@ -827,7 +827,7 @@ create table aos_products (
 );
 
 create table aos_products_audit (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   parent_id uuid not null,
   date_created timestamptz default null,
   created_by uuid default null,
@@ -842,10 +842,10 @@ create table aos_products_audit (
 create index idx_aos_products_parent_id on aos_products_audit (parent_id);
 
 create table aos_products_quotes (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   name text default null,
-  date_entered timestamptz default null,
-  date_modified timestamptz default null,
+  created_date timestamptz default null,
+  modified_date timestamptz default null,
   modified_user_id uuid default null,
   created_by uuid default null,
   description text default null,
@@ -881,7 +881,7 @@ create table aos_products_quotes (
 create index idx_aospq_par_del on aos_products_quotes(parent_id,parent_type,deleted);
 
 create table aos_products_quotes_audit (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   parent_id uuid not null,
   date_created timestamptz default null,
   created_by uuid default null,
@@ -896,10 +896,10 @@ create table aos_products_quotes_audit (
 create index idx_aos_products_quotes_parent_id on aos_products_quotes_audit(parent_id);
 
 create table aos_quotes (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   name varchar(255) default null,
-  date_entered timestamptz default null,
-  date_modified timestamptz default null,
+  created_date timestamptz default null,
+  modified_date timestamptz default null,
   modified_user_id uuid default null,
   created_by uuid default null,
   description text default null,
@@ -948,8 +948,8 @@ create table aos_quotes (
 );
 
 create table aos_quotes_aos_invoices_c (
-  id uuid primary key,
-  date_modified timestamptz default null,
+  id uuid primary key default gen_random_uuid(),
+  modified_date timestamptz default null,
   deleted boolean default false,
   aos_quotes77d9_quotes_ida uuid default null,
   aos_quotes6b83nvoices_idb uuid default null
@@ -958,7 +958,7 @@ create table aos_quotes_aos_invoices_c (
 create index aos_quotes_aos_invoices_alt on aos_quotes_aos_invoices_c(aos_quotes77d9_quotes_ida,aos_quotes6b83nvoices_idb);
 
 create table aos_quotes_audit (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   parent_id uuid not null,
   date_created timestamptz default null,
   created_by uuid default null,
@@ -973,8 +973,8 @@ create table aos_quotes_audit (
 create index idx_aos_quotes_parent_id on aos_quotes_audit(parent_id);
 
 create table aos_quotes_os_contracts_c (
-  id uuid primary key,
-  date_modified timestamptz default null,
+  id uuid primary key default gen_random_uuid(),
+  modified_date timestamptz default null,
   deleted boolean default false,
   aos_quotese81e_quotes_ida uuid default null,
   aos_quotes4dc0ntracts_idb uuid default null
@@ -983,8 +983,8 @@ create table aos_quotes_os_contracts_c (
 create index aos_quotes_aos_contracts_alt on aos_quotes_os_contracts_c(aos_quotese81e_quotes_ida,aos_quotes4dc0ntracts_idb);
 
 create table aos_quotes_project_c (
-  id uuid primary key,
-  date_modified timestamptz default null,
+  id uuid primary key default gen_random_uuid(),
+  modified_date timestamptz default null,
   deleted boolean default false,
   aos_quotes1112_quotes_ida uuid default null,
   aos_quotes7207project_idb uuid default null
@@ -993,10 +993,10 @@ create table aos_quotes_project_c (
 create index aos_quotes_project_alt on aos_quotes_project_c(aos_quotes1112_quotes_ida,aos_quotes7207project_idb);
 
 create table aow_actions (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   name varchar(255) default null,
-  date_entered timestamptz default null,
-  date_modified timestamptz default null,
+  created_date timestamptz default null,
+  modified_date timestamptz default null,
   modified_user_id uuid default null,
   created_by uuid default null,
   description text default null,
@@ -1010,10 +1010,10 @@ create table aow_actions (
 create index aow_action_index_workflow_id on aow_actions(aow_workflow_id);
 
 create table aow_conditions (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   name varchar(255) default null,
-  date_entered timestamptz default null,
-  date_modified timestamptz default null,
+  created_date timestamptz default null,
+  modified_date timestamptz default null,
   modified_user_id uuid default null,
   created_by uuid default null,
   description text default null,
@@ -1030,10 +1030,10 @@ create table aow_conditions (
 create index aow_conditions_index_workflow_id on aow_conditions(aow_workflow_id);
 
 create table aow_processed (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   name varchar(255) default null,
-  date_entered timestamptz default null,
-  date_modified timestamptz default null,
+  created_date timestamptz default null,
+  modified_date timestamptz default null,
   modified_user_id uuid default null,
   created_by uuid default null,
   description text default null,
@@ -1049,11 +1049,11 @@ create index aow_processed_index_status on aow_processed(status);
 create index aow_processed_index_workflow_id on aow_processed(aow_workflow_id);
 
 create table aow_processed_aow_actions (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   aow_processed_id uuid default null,
   aow_action_id uuid default null,
   status varchar(36) default 'pending',
-  date_modified timestamptz default null,
+  modified_date timestamptz default null,
   deleted boolean default false
 );
 
@@ -1061,10 +1061,10 @@ create index idx_aow_processed_aow_actions on aow_processed_aow_actions(aow_proc
 create index idx_actid_del_freid on aow_processed_aow_actions(aow_action_id,deleted,aow_processed_id);
 
 create table aow_workflow (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   name varchar(255) default null,
-  date_entered timestamptz default null,
-  date_modified timestamptz default null,
+  created_date timestamptz default null,
+  modified_date timestamptz default null,
   modified_user_id uuid default null,
   created_by uuid default null,
   description text default null,
@@ -1081,7 +1081,7 @@ create table aow_workflow (
 create index aow_workflow_index_status on aow_workflow(status);
 
 create table aow_workflow_audit (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   parent_id uuid not null,
   date_created timestamptz default null,
   created_by uuid default null,
@@ -1096,10 +1096,10 @@ create table aow_workflow_audit (
 create index idx_aow_workflow_parent_id on aow_workflow_audit(parent_id);
 
 create table bugs (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   name varchar(255) default null,
-  date_entered timestamptz default null,
-  date_modified timestamptz default null,
+  created_date timestamptz default null,
+  modified_date timestamptz default null,
   modified_user_id uuid default null,
   created_by uuid default null,
   description text default null,
@@ -1122,7 +1122,7 @@ create index idx_bug_name on bugs(name);
 create index idx_bugs_assigned_user on bugs(assigned_user_id);
 
 create table bugs_audit (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   parent_id uuid not null,
   date_created timestamptz default null,
   created_by uuid default null,
@@ -1137,10 +1137,10 @@ create table bugs_audit (
 create index idx_bugs_parent_id on bugs_audit(parent_id);
 
 create table calls (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   name varchar(50) default null,
-  date_entered timestamptz default null,
-  date_modified timestamptz default null,
+  created_date timestamptz default null,
+  modified_date timestamptz default null,
   modified_user_id uuid default null,
   created_by uuid default null,
   description text default null,
@@ -1174,12 +1174,12 @@ create index idx_calls_par_del on calls(parent_id,parent_type,deleted);
 create index idx_calls_assigned_del on calls(deleted,assigned_user_id);
 
 create table calls_contacts (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   call_id uuid default null,
   contact_id uuid default null,
   required varchar(1) default '1',
   accept_status varchar(25) default 'none',
-  date_modified timestamptz default null,
+  modified_date timestamptz default null,
   deleted boolean default false
 );
 
@@ -1188,12 +1188,12 @@ create index idx_con_call_con on calls_contacts (contact_id);
 create index idx_call_contact on calls_contacts(call_id,contact_id);
 
 create table calls_leads (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   call_id uuid default null,
   lead_id uuid default null,
   required varchar(1) default '1',
   accept_status varchar(25) default 'none',
-  date_modified timestamptz default null,
+  modified_date timestamptz default null,
   deleted boolean default false
 );
 
@@ -1202,10 +1202,10 @@ create index idx_lead_call_lead on calls_leads(lead_id);
 create index idx_call_lead on calls_leads(call_id,lead_id);
 
 create table calls_reschedule (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   name varchar(255) default null,
-  date_entered timestamptz default null,
-  date_modified timestamptz default null,
+  created_date timestamptz default null,
+  modified_date timestamptz default null,
   modified_user_id uuid default null,
   created_by uuid default null,
   description text default null,
@@ -1216,7 +1216,7 @@ create table calls_reschedule (
 );
 
 create table calls_reschedule_audit (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   parent_id uuid not null,
   date_created timestamptz default null,
   created_by uuid default null,
@@ -1231,12 +1231,12 @@ create table calls_reschedule_audit (
 create index idx_calls_reschedule_parent_id on calls_reschedule_audit(parent_id);
 
 create table calls_users (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   call_id uuid default null,
   user_id uuid default null,
   required varchar(1) default '1',
   accept_status varchar(25) default 'none',
-  date_modified timestamptz default null,
+  modified_date timestamptz default null,
   deleted boolean default false
 );
 
@@ -1245,7 +1245,7 @@ create index idx_usr_call_usr on calls_users(user_id);
 create index idx_call_users on calls_users(call_id,user_id);
 
 create table campaign_log (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   campaign_id uuid default null,
   target_tracker_key uuid default null,
   target_id uuid default null,
@@ -1258,7 +1258,7 @@ create table campaign_log (
   hits int default 0,
   list_id uuid default null,
   deleted boolean default null,
-  date_modified timestamptz default null,
+  modified_date timestamptz default null,
   more_information varchar(100) default null,
   marketing_id uuid default null
 );
@@ -1270,13 +1270,13 @@ create index idx_target_id on campaign_log(target_id);
 create index idx_target_id_deleted on campaign_log(target_id,deleted);
 
 create table campaign_trkrs (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   tracker_name varchar(255) default null,
   tracker_url varchar(255) default 'http://',
   tracker_key serial not null,
   campaign_id uuid default null,
-  date_entered timestamptz default null,
-  date_modified timestamptz default null,
+  created_date timestamptz default null,
+  modified_date timestamptz default null,
   modified_user_id uuid default null,
   created_by uuid default null,
   is_optout boolean default false,
@@ -1286,10 +1286,10 @@ create table campaign_trkrs (
 create index campaign_tracker_key_idx on campaign_trkrs(tracker_key);
 
 create table campaigns (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   name varchar(255) default null,
-  date_entered timestamptz default null,
-  date_modified timestamptz default null,
+  created_date timestamptz default null,
+  modified_date timestamptz default null,
   modified_user_id uuid default null,
   created_by uuid default null,
   deleted boolean default false,
@@ -1319,7 +1319,7 @@ create index idx_campaign_name on campaigns(name);
 create index idx_survey_id on campaigns(survey_id);
 
 create table campaigns_audit (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   parent_id uuid not null,
   date_created timestamptz default null,
   created_by uuid default null,
@@ -1334,10 +1334,10 @@ create table campaigns_audit (
 create index idx_campaigns_parent_id on campaigns_audit(parent_id);
 
 create table cases (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   name varchar(255) default null,
-  date_entered timestamptz default null,
-  date_modified timestamptz default null,
+  created_date timestamptz default null,
+  modified_date timestamptz default null,
   modified_user_id uuid default null,
   created_by uuid default null,
   description text default null,
@@ -1361,7 +1361,7 @@ create index idx_account_id on cases(account_id);
 create index idx_cases_stat_del on cases(assigned_user_id,status,deleted);
 
 create table cases_audit (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   parent_id uuid not null,
   date_created timestamptz default null,
   created_by uuid default null,
@@ -1376,10 +1376,10 @@ create table cases_audit (
 create index idx_cases_parent_id on cases_audit(parent_id);
 
 create table cases_bugs (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   case_id uuid default null,
   bug_id uuid default null,
-  date_modified timestamptz default null,
+  modified_date timestamptz default null,
   deleted boolean default false
 );
 
@@ -1404,9 +1404,9 @@ create table config (
 create index idx_config_cat on config(category);
 
 create table contacts (
-  id uuid primary key,
-  date_entered timestamptz default null,
-  date_modified timestamptz default null,
+  id uuid primary key default gen_random_uuid(),
+  created_date timestamptz default null,
+  modified_date timestamptz default null,
   modified_user_id uuid default null,
   created_by uuid default null,
   description text default null,
@@ -1456,7 +1456,7 @@ create index idx_del_id_user on contacts(deleted,id,assigned_user_id);
 create index idx_cont_assigned on contacts(assigned_user_id);
 
 create table contacts_audit (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   parent_id uuid not null,
   date_created timestamptz default null,
   created_by uuid default null,
@@ -1471,11 +1471,11 @@ create table contacts_audit (
 create index idx_contacts_parent_id on contacts_audit(parent_id);
 
 create table contacts_bugs (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   contact_id uuid default null,
   bug_id uuid default null,
   contact_role varchar(50) default null,
-  date_modified timestamptz default null,
+  modified_date timestamptz default null,
   deleted boolean default false
 );
 
@@ -1484,11 +1484,11 @@ create index idx_con_bug_bug on contacts_bugs(bug_id);
 create index idx_contact_bug on contacts_bugs(contact_id,bug_id);
 
 create table contacts_cases (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   contact_id uuid default null,
   case_id uuid default null,
   contact_role varchar(50) default null,
-  date_modified timestamptz default null,
+  modified_date timestamptz default null,
   deleted boolean default false
 );
 
@@ -1505,10 +1505,10 @@ create table contacts_cstm (
 );
 
 create table contacts_users (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   contact_id uuid default null,
   user_id uuid default null,
-  date_modified timestamptz default null,
+  modified_date timestamptz default null,
   deleted boolean default false
 );
 
@@ -1517,25 +1517,25 @@ create index idx_con_users_user on contacts_users(user_id);
 create index idx_contacts_users on contacts_users(contact_id,user_id);
 
 create table cron_remove_documents (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   bean_id uuid default null,
   module varchar(25) default null,
-  date_modified timestamptz default null
+  modified_date timestamptz default null
 );
 
 create index idx_cron_remove_document_bean_id on cron_remove_documents(bean_id);
-create index idx_cron_remove_document_stamp on cron_remove_documents(date_modified);
+create index idx_cron_remove_document_stamp on cron_remove_documents(modified_date);
 
 create table currencies (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   name uuid default null,
   symbol varchar(36) default null,
   iso4217 varchar(3) default null,
   conversion_rate double precision default 0,
   status varchar(100) default null,
   deleted boolean default null,
-  date_entered timestamptz default null,
-  date_modified timestamptz default null,
+  created_date timestamptz default null,
+  modified_date timestamptz default null,
   created_by uuid not null
 );
 
@@ -1560,28 +1560,28 @@ create table custom_fields (
 create index idx_beanid_set_num on custom_fields(bean_id,set_num);
 
 create table document_revisions (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   change_log varchar(255) default null,
   document_id uuid default null,
   doc_id varchar(100) default null,
   doc_type varchar(100) default null,
   doc_url varchar(255) default null,
-  date_entered timestamptz default null,
+  created_date timestamptz default null,
   created_by uuid default null,
   filename varchar(255) default null,
   file_ext varchar(100) default null,
   file_mime_type varchar(100) default null,
   revision varchar(100) default null,
   deleted boolean default false,
-  date_modified timestamptz default null
+  modified_date timestamptz default null
 );
 
 create index documentrevision_mimetype on document_revisions(file_mime_type);
 
 create table documents (
-  id uuid primary key,
-  date_entered timestamptz default null,
-  date_modified timestamptz default null,
+  id uuid primary key default gen_random_uuid(),
+  created_date timestamptz default null,
+  modified_date timestamptz default null,
   modified_user_id uuid default null,
   created_by uuid default null,
   description text default null,
@@ -1606,8 +1606,8 @@ create table documents (
 create index idx_doc_cat on documents(category_id,subcategory_id);
 
 create table documents_accounts (
-  id uuid primary key,
-  date_modified timestamptz default null,
+  id uuid primary key default gen_random_uuid(),
+  modified_date timestamptz default null,
   deleted boolean default false,
   document_id uuid default null,
   account_id uuid default null
@@ -1617,8 +1617,8 @@ create index documents_accounts_account_id on documents_accounts(account_id,docu
 create index documents_accounts_document_id on documents_accounts(document_id,account_id);
 
 create table documents_bugs (
-  id uuid primary key,
-  date_modified timestamptz default null,
+  id uuid primary key default gen_random_uuid(),
+  modified_date timestamptz default null,
   deleted boolean default false,
   document_id uuid default null,
   bug_id uuid default null
@@ -1628,8 +1628,8 @@ create index documents_bugs_bug_id on documents_bugs(bug_id,document_id);
 create index documents_bugs_document_id on documents_bugs(document_id,bug_id);
 
 create table documents_cases (
-  id uuid primary key,
-  date_modified timestamptz default null,
+  id uuid primary key default gen_random_uuid(),
+  modified_date timestamptz default null,
   deleted boolean default false,
   document_id uuid default null,
   case_id uuid default null
@@ -1639,8 +1639,8 @@ create index documents_cases_case_id on documents_cases(case_id,document_id);
 create index documents_cases_document_id on documents_cases(document_id,case_id);
 
 create table documents_contacts (
-  id uuid primary key,
-  date_modified timestamptz default null,
+  id uuid primary key default gen_random_uuid(),
+  modified_date timestamptz default null,
   deleted boolean default false,
   document_id uuid default null,
   contact_id uuid default null
@@ -1650,8 +1650,8 @@ create index documents_contacts_contact_id on documents_contacts(contact_id,docu
 create index documents_contacts_document_id on documents_contacts(document_id,contact_id);
 
 create table documents_opportunities (
-  id uuid primary key,
-  date_modified timestamptz default null,
+  id uuid primary key default gen_random_uuid(),
+  modified_date timestamptz default null,
   deleted boolean default false,
   document_id uuid default null,
   opportunity_id uuid default null
@@ -1661,10 +1661,10 @@ create index idx_docu_opps_oppo_id on documents_opportunities(opportunity_id,doc
 create index idx_oppo_docu_id on documents_opportunities(document_id,opportunity_id);
 
 create table eapm (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   name varchar(255) default null,
-  date_entered timestamptz default null,
-  date_modified timestamptz default null,
+  created_date timestamptz default null,
+  modified_date timestamptz default null,
   modified_user_id uuid default null,
   created_by uuid default null,
   description text default null,
@@ -1684,14 +1684,14 @@ create table eapm (
 create index idx_app_active on eapm(assigned_user_id,application,validated);
 
 create table email_addr_bean_rel (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   email_address_id uuid not null,
   bean_id uuid not null,
   bean_module varchar(100) default null,
   primary_address boolean default false,
   reply_to_address boolean default false,
   date_created timestamptz default null,
-  date_modified timestamptz default null,
+  modified_date timestamptz default null,
   deleted boolean default false
 );
 
@@ -1699,7 +1699,7 @@ create index idx_email_address_id on email_addr_bean_rel(email_address_id);
 create index idx_bean_id on email_addr_bean_rel(bean_id,bean_module);
 
 create table email_addresses (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   email_address varchar(255) default null,
   email_address_caps varchar(255) default null,
   invalid_email boolean default false,
@@ -1710,7 +1710,7 @@ create table email_addresses (
   confirm_opt_in_fail_date timestamptz default null,
   confirm_opt_in_token varchar(255) default null,
   date_created timestamptz default null,
-  date_modified timestamptz default null,
+  modified_date timestamptz default null,
   deleted boolean default false
 );
 
@@ -1718,7 +1718,7 @@ create index idx_ea_caps_opt_out_invalid on email_addresses(email_address_caps,o
 create index idx_ea_opt_out_invalid on email_addresses(email_address,opt_out,invalid_email);
 
 create table email_addresses_audit (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   parent_id uuid not null,
   date_created timestamptz default null,
   created_by uuid default null,
@@ -1758,10 +1758,10 @@ create index idx_mail_subj on email_cache(subject);
 create index idx_mail_to on email_cache(toaddr);
 
 create table email_marketing (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   deleted boolean default null,
-  date_entered timestamptz default null,
-  date_modified timestamptz default null,
+  created_date timestamptz default null,
+  modified_date timestamptz default null,
   modified_user_id uuid default null,
   created_by uuid default null,
   name varchar(255) default null,
@@ -1782,19 +1782,19 @@ create index idx_emmkt_name on email_marketing(name);
 create index idx_emmkit_del on email_marketing(deleted);
 
 create table email_marketing_prospect_lists (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   prospect_list_id uuid default null,
   email_marketing_id uuid default null,
-  date_modified timestamptz default null,
+  modified_date timestamptz default null,
   deleted boolean default false
 );
 
 create index email_mp_prospects on email_marketing_prospect_lists(email_marketing_id,prospect_list_id);
 
 create table email_templates (
-  id uuid primary key,
-  date_entered timestamptz default null,
-  date_modified timestamptz default null,
+  id uuid primary key default gen_random_uuid(),
+  created_date timestamptz default null,
+  modified_date timestamptz default null,
   modified_user_id uuid default null,
   created_by uuid default null,
   published varchar(3) default null,
@@ -1812,9 +1812,9 @@ create table email_templates (
 create index idx_te_name on email_templates(name);
 
 create table emailman (
-  id uuid primary key,
-  date_entered timestamptz default null,
-  date_modified timestamptz default null,
+  id uuid primary key default gen_random_uuid(),
+  created_date timestamptz default null,
+  modified_date timestamptz default null,
   user_id uuid default null,
   campaign_id uuid default null,
   marketing_id uuid default null,
@@ -1835,10 +1835,10 @@ create index idx_eman_campaign_id on emailman(campaign_id);
 create index idx_eman_relid_reltype_id on emailman(related_id,related_type,campaign_id);
 
 create table emails (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   name varchar(255) default null,
-  date_entered timestamptz default null,
-  date_modified timestamptz default null,
+  created_date timestamptz default null,
+  modified_date timestamptz default null,
   modified_user_id uuid default null,
   created_by uuid default null,
   deleted boolean default false,
@@ -1867,12 +1867,12 @@ create index idx_email_cat on emails(category_id);
 create index idx_email_uid on emails(uid);
 
 create table emails_beans (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   email_id uuid default null,
   bean_id uuid default null,
   bean_module varchar(100) default null,
   campaign_data text default null,
-  date_modified timestamptz default null,
+  modified_date timestamptz default null,
   deleted boolean default false
 );
 
@@ -1880,7 +1880,7 @@ create index idx_emails_beans_bean_id on emails_beans(bean_id);
 create index idx_emails_beans_email_bean on emails_beans(email_id,bean_id,deleted);
 
 create table emails_email_addr_rel (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   email_id uuid not null,
   address_type varchar(4) default null,
   email_address_id uuid not null,
@@ -1891,7 +1891,7 @@ create index idx_eearl_email_id on emails_email_addr_rel(email_id,address_type);
 create index idx_eearl_address_id on emails_email_addr_rel(email_address_id);
 
 create table emails_text (
-  email_id uuid primary key,
+  email_id uuid primary key default gen_random_uuid(),
   from_addr varchar(250) default null,
   reply_to_addr varchar(250) default null,
   to_addrs text default null,
@@ -1906,10 +1906,10 @@ create table emails_text (
 create index emails_textfromaddr on emails_text(from_addr);
 
 create table external_oauth_connections (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   name varchar(255) default null,
-  date_entered timestamptz default null,
-  date_modified timestamptz default null,
+  created_date timestamptz default null,
+  modified_date timestamptz default null,
   modified_user_id uuid default null,
   created_by uuid default null,
   description text default null,
@@ -1925,10 +1925,10 @@ create table external_oauth_connections (
 );
 
 create table external_oauth_providers (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   name varchar(255) default null,
-  date_entered timestamptz default null,
-  date_modified timestamptz default null,
+  created_date timestamptz default null,
+  modified_date timestamptz default null,
   modified_user_id uuid default null,
   created_by uuid default null,
   description text default null,
@@ -1953,10 +1953,10 @@ create table external_oauth_providers (
 );
 
 create table favorites (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   name varchar(255) default null,
-  date_entered timestamptz default null,
-  date_modified timestamptz default null,
+  created_date timestamptz default null,
+  modified_date timestamptz default null,
   modified_user_id uuid default null,
   created_by uuid default null,
   description text default null,
@@ -1977,7 +1977,7 @@ create table fields_meta_data (
   len int default null,
   required boolean default false,
   default_value varchar(255) default null,
-  date_modified timestamptz default null,
+  modified_date timestamptz default null,
   deleted boolean default false,
   audited boolean default false,
   massupdate boolean default false,
@@ -1994,7 +1994,7 @@ create index idx_meta_id_del on fields_meta_data(id,deleted);
 create index idx_meta_cm_del on fields_meta_data(custom_module,deleted);
 
 create table folders (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   name varchar(255) default null,
   folder_type varchar(25) default null,
   parent_folder uuid default null,
@@ -2011,7 +2011,7 @@ create table folders (
 create index idx_parent_folder on folders(parent_folder);
 
 create table folders_rel (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   folder_id uuid not null,
   polymorphic_module varchar(25) default null,
   polymorphic_id uuid not null,
@@ -2022,7 +2022,7 @@ create index idx_poly_module_poly_id on folders_rel(polymorphic_module,polymorph
 create index idx_fr_id_deleted_poly on folders_rel(folder_id,deleted,polymorphic_id);
 
 create table folders_subscriptions (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   folder_id uuid not null,
   assigned_user_id uuid not null
 );
@@ -2030,10 +2030,10 @@ create table folders_subscriptions (
 create index idx_folder_id_assigned_user_id on folders_subscriptions(folder_id,assigned_user_id);
 
 create table fp_event_locations (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   name varchar(255) default null,
-  date_entered timestamptz default null,
-  date_modified timestamptz default null,
+  created_date timestamptz default null,
+  modified_date timestamptz default null,
   modified_user_id uuid default null,
   created_by uuid default null,
   description text default null,
@@ -2048,7 +2048,7 @@ create table fp_event_locations (
 );
 
 create table fp_event_locations_audit (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   parent_id uuid not null,
   date_created timestamptz default null,
   created_by uuid default null,
@@ -2063,8 +2063,8 @@ create table fp_event_locations_audit (
 create index idx_fp_event_locations_parent_id on fp_event_locations_audit(parent_id);
 
 create table fp_event_locations_fp_events_1_c (
-  id uuid primary key,
-  date_modified timestamptz default null,
+  id uuid primary key default gen_random_uuid(),
+  modified_date timestamptz default null,
   deleted boolean default false,
   fp_event_locations_fp_events_1fp_event_locations_ida uuid default null,
   fp_event_locations_fp_events_1fp_events_idb uuid default null
@@ -2074,10 +2074,10 @@ create index fp_event_locations_fp_events_1_ida1 on fp_event_locations_fp_events
 create index fp_event_locations_fp_events_1_alt on fp_event_locations_fp_events_1_c(fp_event_locations_fp_events_1fp_events_idb);
 
 create table fp_events (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   name varchar(255) default null,
-  date_entered timestamptz default null,
-  date_modified timestamptz default null,
+  created_date timestamptz default null,
+  modified_date timestamptz default null,
   modified_user_id uuid default null,
   created_by uuid default null,
   description text default null,
@@ -2096,7 +2096,7 @@ create table fp_events (
 );
 
 create table fp_events_audit (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   parent_id uuid not null,
   date_created timestamptz default null,
   created_by uuid default null,
@@ -2111,8 +2111,8 @@ create table fp_events_audit (
 create index idx_fp_events_parent_id on fp_events_audit(parent_id);
 
 create table fp_events_contacts_c (
-  id uuid primary key,
-  date_modified timestamptz default null,
+  id uuid primary key default gen_random_uuid(),
+  modified_date timestamptz default null,
   deleted boolean default false,
   fp_events_contactsfp_events_ida uuid default null,
   fp_events_contactscontacts_idb uuid default null,
@@ -2124,8 +2124,8 @@ create table fp_events_contacts_c (
 create index fp_events_contacts_alt on fp_events_contacts_c(fp_events_contactsfp_events_ida,fp_events_contactscontacts_idb);
 
 create table fp_events_fp_event_delegates_1_c (
-  id uuid primary key,
-  date_modified timestamptz default null,
+  id uuid primary key default gen_random_uuid(),
+  modified_date timestamptz default null,
   deleted boolean default false,
   fp_events_fp_event_delegates_1fp_events_ida uuid default null,
   fp_events_fp_event_delegates_1fp_event_delegates_idb uuid default null
@@ -2136,7 +2136,7 @@ create index fp_events_fp_event_delegates_1_alt on fp_events_fp_event_delegates_
 
 create table fp_events_fp_event_locations_1_c (
   id uuid not null,
-  date_modified timestamptz default null,
+  modified_date timestamptz default null,
   deleted boolean default false,
   fp_events_fp_event_locations_1fp_events_ida uuid default null,
   fp_events_fp_event_locations_1fp_event_locations_idb uuid default null
@@ -2147,8 +2147,8 @@ create index fp_events_fp_event_locations_1_alt on fp_events_fp_event_locations_
 );
 
 create table fp_events_leads_1_c (
-  id uuid primary key,
-  date_modified timestamptz default null,
+  id uuid primary key default gen_random_uuid(),
+  modified_date timestamptz default null,
   deleted boolean default false,
   fp_events_leads_1fp_events_ida uuid default null,
   fp_events_leads_1leads_idb uuid default null,
@@ -2160,8 +2160,8 @@ create table fp_events_leads_1_c (
 create index fp_events_leads_1_alt on fp_events_leads_1_c(fp_events_leads_1fp_events_ida,fp_events_leads_1leads_idb);
 
 create table fp_events_prospects_1_c (
-  id uuid primary key,
-  date_modified timestamptz default null,
+  id uuid primary key default gen_random_uuid(),
+  modified_date timestamptz default null,
   deleted boolean default false,
   fp_events_prospects_1fp_events_ida uuid default null,
   fp_events_prospects_1prospects_idb uuid default null,
@@ -2173,7 +2173,7 @@ create table fp_events_prospects_1_c (
 create index fp_events_prospects_1_alt on fp_events_prospects_1_c(fp_events_prospects_1fp_events_ida,fp_events_prospects_1prospects_idb);
 
 create table import_maps (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   name varchar(254) default null,
   source varchar(36) default null,
   enclosure varchar(1) default ' ',
@@ -2183,8 +2183,8 @@ create table import_maps (
   default_values text default null,
   has_header boolean default true,
   deleted boolean default false,
-  date_entered timestamptz default null,
-  date_modified timestamptz default null,
+  created_date timestamptz default null,
+  modified_date timestamptz default null,
   assigned_user_id uuid default null,
   is_published varchar(3) default 'no'
 );
@@ -2192,10 +2192,10 @@ create table import_maps (
 create index idx_owner_module_name on import_maps(assigned_user_id,module,name,deleted);
 
 create table inbound_email (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   deleted boolean default false,
-  date_entered timestamptz default null,
-  date_modified timestamptz default null,
+  created_date timestamptz default null,
+  modified_date timestamptz default null,
   modified_user_id uuid default null,
   created_by uuid default null,
   name varchar(255) default null,
@@ -2228,10 +2228,10 @@ create table inbound_email (
 );
 
 create table inbound_email_autoreply (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   deleted boolean default false,
-  date_entered timestamptz default null,
-  date_modified timestamptz default null,
+  created_date timestamptz default null,
+  modified_date timestamptz default null,
   autoreplied_to varchar(100) default null,
   ie_id uuid
 );
@@ -2239,15 +2239,15 @@ create table inbound_email_autoreply (
 create index idx_ie_autoreplied_to on inbound_email_autoreply(autoreplied_to);
 
 create table inbound_email_cache_ts (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   ie_timestamp bigint default null
 );
 
 create table jjwg_address_cache (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   name varchar(255) default null,
-  date_entered timestamptz default null,
-  date_modified timestamptz default null,
+  created_date timestamptz default null,
+  modified_date timestamptz default null,
   modified_user_id uuid default null,
   created_by uuid default null,
   description text default null,
@@ -2258,7 +2258,7 @@ create table jjwg_address_cache (
 );
 
 create table jjwg_address_cache_audit (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   parent_id uuid not null,
   date_created timestamptz default null,
   created_by varchar(36) default null,
@@ -2273,10 +2273,10 @@ create table jjwg_address_cache_audit (
 create index idx_jjwg_address_cache_parent_id on jjwg_address_cache_audit(parent_id);
 
 create table jjwg_areas (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   name varchar(255) default null,
-  date_entered timestamptz default null,
-  date_modified timestamptz default null,
+  created_date timestamptz default null,
+  modified_date timestamptz default null,
   modified_user_id uuid default null,
   created_by uuid default null,
   description text default null,
@@ -2289,7 +2289,7 @@ create table jjwg_areas (
 );
 
 create table jjwg_areas_audit (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   parent_id uuid not null,
   date_created timestamptz default null,
   created_by uuid default null,
@@ -2304,10 +2304,10 @@ create table jjwg_areas_audit (
 create index idx_jjwg_areas_parent_id on jjwg_areas_audit(parent_id);
 
 create table jjwg_maps (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   name varchar(255) default null,
-  date_entered timestamptz default null,
-  date_modified timestamptz default null,
+  created_date timestamptz default null,
+  modified_date timestamptz default null,
   modified_user_id uuid default null,
   created_by uuid default null,
   description text default null,
@@ -2321,7 +2321,7 @@ create table jjwg_maps (
 );
 
 create table jjwg_maps_audit (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   parent_id uuid not null,
   date_created timestamptz default null,
   created_by uuid default null,
@@ -2336,8 +2336,8 @@ create table jjwg_maps_audit (
 create index idx_jjwg_maps_parent_id on jjwg_maps_audit(parent_id);
 
 create table jjwg_maps_jjwg_areas_c (
-  id uuid primary key,
-  date_modified timestamptz default null,
+  id uuid primary key default gen_random_uuid(),
+  modified_date timestamptz default null,
   deleted boolean default false,
   jjwg_maps_5304wg_maps_ida uuid default null,
   jjwg_maps_41f2g_areas_idb uuid default null
@@ -2346,8 +2346,8 @@ create table jjwg_maps_jjwg_areas_c (
 create index jjwg_maps_jjwg_areas_alt on jjwg_maps_jjwg_areas_c(jjwg_maps_5304wg_maps_ida,jjwg_maps_41f2g_areas_idb);
 
 create table jjwg_maps_jjwg_markers_c (
-  id uuid primary key,
-  date_modified timestamptz default null,
+  id uuid primary key default gen_random_uuid(),
+  modified_date timestamptz default null,
   deleted boolean default false,
   jjwg_maps_b229wg_maps_ida uuid default null,
   jjwg_maps_2e31markers_idb uuid default null
@@ -2356,10 +2356,10 @@ create table jjwg_maps_jjwg_markers_c (
 create index jjwg_maps_jjwg_markers_alt on jjwg_maps_jjwg_markers_c(jjwg_maps_b229wg_maps_ida,jjwg_maps_2e31markers_idb);
 
 create table jjwg_markers (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   name varchar(255) default null,
-  date_entered timestamptz default null,
-  date_modified timestamptz default null,
+  created_date timestamptz default null,
+  modified_date timestamptz default null,
   modified_user_id uuid default null,
   created_by uuid default null,
   description text default null,
@@ -2374,7 +2374,7 @@ create table jjwg_markers (
 );
 
 create table jjwg_markers_audit (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   parent_id uuid not null,
   date_created timestamptz default null,
   created_by uuid default null,
@@ -2389,12 +2389,12 @@ create table jjwg_markers_audit (
 create index idx_jjwg_markers_parent_id on jjwg_markers_audit(parent_id);
 
 create table job_queue (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   assigned_user_id uuid default null,
   name varchar(255) default null,
   deleted boolean default false,
-  date_entered timestamptz default null,
-  date_modified timestamptz default null,
+  created_date timestamptz default null,
+  modified_date timestamptz default null,
   scheduler_id uuid default null,
   execute_time timestamptz default null,
   status varchar(20) default null,
@@ -2411,14 +2411,14 @@ create table job_queue (
 );
 
 create index idx_status_scheduler on job_queue(status,scheduler_id);
-create index idx_status_time on job_queue(status,execute_time,date_entered);
-create index idx_status_entered on job_queue(status,date_entered);
-create index idx_status_modified on job_queue(status,date_modified);
+create index idx_status_time on job_queue(status,execute_time,created_date);
+create index idx_status_entered on job_queue(status,created_date);
+create index idx_status_modified on job_queue(status,modified_date);
 
 create table leads (
-  id uuid primary key,
-  date_entered timestamptz default null,
-  date_modified timestamptz default null,
+  id uuid primary key default gen_random_uuid(),
+  created_date timestamptz default null,
+  modified_date timestamptz default null,
   modified_user_id uuid default null,
   created_by uuid default null,
   description text default null,
@@ -2485,7 +2485,7 @@ create index idx_lead_phone_work on leads(phone_work);
 create index idx_leads_id_del on leads(id,deleted);
 
 create table leads_audit (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   parent_id uuid,
   date_created timestamptz default null,
   created_by uuid default null,
@@ -2508,22 +2508,22 @@ create table leads_cstm (
 );
 
 create table linked_documents (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   parent_id uuid default null,
   parent_type varchar(25) default null,
   document_id uuid default null,
   document_revision_id uuid default null,
-  date_modified timestamptz default null,
+  modified_date timestamptz default null,
   deleted boolean default false
 );
 
 create index idx_parent_document on linked_documents(parent_type,parent_id,document_id);
 
 create table meetings (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   name varchar(50) default null,
-  date_entered timestamptz default null,
-  date_modified timestamptz default null,
+  created_date timestamptz default null,
+  modified_date timestamptz default null,
   modified_user_id uuid default null,
   created_by uuid default null,
   description text default null,
@@ -2566,12 +2566,12 @@ create index idx_meet_stat_del on meetings(assigned_user_id,status,deleted);
 create index idx_meet_date_start on meetings(date_start);
 
 create table meetings_contacts (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   meeting_id uuid default null,
   contact_id uuid default null,
   required varchar(1) default '1',
   accept_status varchar(25) default 'none',
-  date_modified timestamptz default null,
+  modified_date timestamptz default null,
   deleted boolean default false
 );
 
@@ -2588,12 +2588,12 @@ create table meetings_cstm (
 );
 
 create table meetings_leads (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   meeting_id uuid default null,
   lead_id uuid default null,
   required varchar(1) default '1',
   accept_status varchar(25) default 'none',
-  date_modified timestamptz default null,
+  modified_date timestamptz default null,
   deleted boolean default false
 );
 
@@ -2602,12 +2602,12 @@ create index idx_lead_meeting_lead on meetings_leads(lead_id);
 create index idx_meeting_lead on meetings_leads(meeting_id,lead_id);
 
 create table meetings_users (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   meeting_id uuid default null,
   user_id uuid default null,
   required varchar(1) default '1',
   accept_status varchar(25) default 'none',
-  date_modified timestamptz default null,
+  modified_date timestamptz default null,
   deleted boolean default false
 );
 
@@ -2616,10 +2616,10 @@ create index idx_usr_mtg_usr on meetings_users(user_id);
 create index idx_meeting_users on meetings_users(meeting_id,user_id);
 
 create table notes (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   assigned_user_id uuid default null,
-  date_entered timestamptz default null,
-  date_modified timestamptz default null,
+  created_date timestamptz default null,
+  modified_date timestamptz default null,
   modified_user_id uuid default null,
   created_by uuid default null,
   name varchar(255) default null,
@@ -2640,10 +2640,10 @@ create index idx_note_contact on notes(contact_id);
 create index idx_notes_assigned_del on notes(deleted,assigned_user_id);
 
 create table oauth2clients (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   name varchar(255) default null,
-  date_entered timestamptz default null,
-  date_modified timestamptz default null,
+  created_date timestamptz default null,
+  modified_date timestamptz default null,
   modified_user_id uuid default null,
   created_by uuid default null,
   description text default null,
@@ -2659,10 +2659,10 @@ create table oauth2clients (
 );
 
 create table oauth2tokens (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   name varchar(255) default null,
-  date_entered timestamptz default null,
-  date_modified timestamptz default null,
+  created_date timestamptz default null,
+  modified_date timestamptz default null,
   modified_user_id uuid default null,
   created_by uuid default null,
   description text default null,
@@ -2680,10 +2680,10 @@ create table oauth2tokens (
 );
 
 create table oauth_consumer (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   name varchar(255) default null,
-  date_entered timestamptz default null,
-  date_modified timestamptz default null,
+  created_date timestamptz default null,
+  modified_date timestamptz default null,
   modified_user_id uuid default null,
   created_by uuid default null,
   description text default null,
@@ -2721,10 +2721,10 @@ create index oauth_state_ts on oauth_tokens(tstate,token_ts);
 create index constoken_key on oauth_tokens(consumer);
 
 create table opportunities (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   name varchar(50) default null,
-  date_entered timestamptz default null,
-  date_modified timestamptz default null,
+  created_date timestamptz default null,
+  modified_date timestamptz default null,
   modified_user_id uuid default null,
   created_by uuid default null,
   description text default null,
@@ -2747,7 +2747,7 @@ create index idx_opp_assigned on opportunities(assigned_user_id);
 create index idx_opp_id_deleted on opportunities(id,deleted);
 
 create table opportunities_audit (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   parent_id uuid not null,
   date_created timestamptz default null,
   created_by uuid default null,
@@ -2762,11 +2762,11 @@ create table opportunities_audit (
 create index idx_opportunities_parent_id on opportunities_audit(parent_id);
 
 create table opportunities_contacts (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   contact_id uuid default null,
   opportunity_id uuid default null,
   contact_role varchar(50) default null,
-  date_modified timestamptz default null,
+  modified_date timestamptz default null,
   deleted boolean default false
 );
 
@@ -2783,7 +2783,7 @@ create table opportunities_cstm (
 );
 
 create table outbound_email (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   name varchar(255) default null,
   type varchar(15) default 'user',
   user_id uuid default null,
@@ -2800,8 +2800,8 @@ create table outbound_email (
   mail_smtppass varchar(100) default null,
   mail_smtpauth_req boolean default false,
   mail_smtpssl varchar(1) default '0',
-  date_entered timestamptz default null,
-  date_modified timestamptz default null,
+  created_date timestamptz default null,
+  modified_date timestamptz default null,
   modified_user_id uuid default null,
   created_by uuid default null,
   deleted boolean default false,
@@ -2809,7 +2809,7 @@ create table outbound_email (
 );
 
 create table outbound_email_audit (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   parent_id uuid not null,
   date_created timestamptz default null,
   created_by uuid default null,
@@ -2824,9 +2824,9 @@ create table outbound_email_audit (
 create index idx_outbound_email_parent_id on outbound_email_audit(parent_id);
 
 create table project (
-  id uuid primary key,
-  date_entered timestamptz default null,
-  date_modified timestamptz default null,
+  id uuid primary key default gen_random_uuid(),
+  created_date timestamptz default null,
+  modified_date timestamptz default null,
   assigned_user_id uuid default null,
   modified_user_id uuid default null,
   created_by uuid default null,
@@ -2841,8 +2841,8 @@ create table project (
 );
 
 create table project_contacts_1_c (
-  id uuid primary key,
-  date_modified timestamptz default null,
+  id uuid primary key default gen_random_uuid(),
+  modified_date timestamptz default null,
   deleted boolean default false,
   project_contacts_1project_ida varchar(36) default null,
   project_contacts_1contacts_idb varchar(36) default null
@@ -2859,9 +2859,9 @@ create table project_cstm (
 );
 
 create table project_task (
-  id uuid primary key,
-  date_entered timestamptz default null,
-  date_modified timestamptz default null,
+  id uuid primary key default gen_random_uuid(),
+  created_date timestamptz default null,
+  modified_date timestamptz default null,
   project_id uuid not null,
   project_task_id int default null,
   name varchar(50) default null,
@@ -2894,7 +2894,7 @@ create table project_task (
 );
 
 create table project_task_audit (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   parent_id uuid not null,
   date_created timestamptz default null,
   created_by uuid default null,
@@ -2909,8 +2909,8 @@ create table project_task_audit (
 create index idx_project_task_parent_id on project_task_audit(parent_id);
 
 create table project_users_1_c (
-  id uuid primary key,
-  date_modified timestamptz default null,
+  id uuid primary key default gen_random_uuid(),
+  modified_date timestamptz default null,
   deleted boolean default false,
   project_users_1project_ida uuid default null,
   project_users_1users_idb uuid default null
@@ -2919,10 +2919,10 @@ create table project_users_1_c (
 create index project_users_1_alt on project_users_1_c(project_users_1project_ida,project_users_1users_idb);
 
 create table projects_accounts (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   account_id uuid default null,
   project_id uuid default null,
-  date_modified timestamptz default null,
+  modified_date timestamptz default null,
   deleted boolean default false
 );
 
@@ -2931,10 +2931,10 @@ create index idx_proj_acct_acct on projects_accounts(account_id);
 create index projects_accounts_alt on projects_accounts (project_id,account_id);
 
 create table projects_bugs (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   bug_id uuid default null,
   project_id uuid default null,
-  date_modified timestamptz default null,
+  modified_date timestamptz default null,
   deleted boolean default false
 );
 
@@ -2943,10 +2943,10 @@ create index idx_proj_bug_bug on projects_bugs(bug_id);
 create index projects_bugs_alt on projects_bugs(project_id,bug_id);
 
 create table projects_cases (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   case_id uuid default null,
   project_id uuid default null,
-  date_modified timestamptz default null,
+  modified_date timestamptz default null,
   deleted boolean default false
 );
 
@@ -2955,10 +2955,10 @@ create index idx_proj_case_case on projects_cases(case_id);
 create index projects_cases_alt on projects_cases(project_id,case_id);
 
 create table projects_contacts (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   contact_id uuid default null,
   project_id uuid default null,
-  date_modified timestamptz default null,
+  modified_date timestamptz default null,
   deleted boolean default false
 );
 
@@ -2967,10 +2967,10 @@ create index idx_proj_con_con on projects_contacts(contact_id);
 create index projects_contacts_alt on projects_contacts(project_id,contact_id);
 
 create table projects_opportunities (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   opportunity_id uuid default null,
   project_id uuid default null,
-  date_modified timestamptz default null,
+  modified_date timestamptz default null,
   deleted boolean default false
 );
 
@@ -2979,10 +2979,10 @@ create index idx_proj_opp_opp on projects_opportunities(opportunity_id);
 create index projects_opportunities_alt on projects_opportunities(project_id,opportunity_id);
 
 create table projects_products (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   product_id uuid default null,
   project_id uuid default null,
-  date_modified timestamptz default null,
+  modified_date timestamptz default null,
   deleted boolean default false
 );
 
@@ -2991,10 +2991,10 @@ create index idx_proj_prod_product on projects_products(product_id);
 create index projects_products_alt on projects_products(project_id,product_id);
 
 create table prospect_list_campaigns (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   prospect_list_id uuid default null,
   campaign_id uuid default null,
-  date_modified timestamptz default null,
+  modified_date timestamptz default null,
   deleted boolean default false
 );
 
@@ -3003,12 +3003,12 @@ create index idx_cam_id on prospect_list_campaigns(campaign_id);
 create index idx_prospect_list_campaigns on prospect_list_campaigns(prospect_list_id,campaign_id);
 
 create table prospect_lists (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   assigned_user_id uuid default null,
   name varchar(255) default null,
   list_type varchar(100) default null,
-  date_entered timestamptz default null,
-  date_modified timestamptz default null,
+  created_date timestamptz default null,
+  modified_date timestamptz default null,
   modified_user_id uuid default null,
   created_by uuid default null,
   deleted boolean default null,
@@ -3019,11 +3019,11 @@ create table prospect_lists (
 create index idx_prospect_list_name on prospect_lists(name);
 
 create table prospect_lists_prospects (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   prospect_list_id uuid default null,
   related_id uuid default null,
   related_type varchar(25) default null,
-  date_modified timestamptz default null,
+  modified_date timestamptz default null,
   deleted boolean default false
 );
 
@@ -3031,9 +3031,9 @@ create index idx_plp_pro_id on prospect_lists_prospects(prospect_list_id,deleted
 create index idx_plp_rel_id on prospect_lists_prospects(related_id,related_type,prospect_list_id);
 
 create table prospects (
-  id uuid primary key,
-  date_entered timestamptz default null,
-  date_modified timestamptz default null,
+  id uuid primary key default gen_random_uuid(),
+  created_date timestamptz default null,
+  modified_date timestamptz default null,
   modified_user_id uuid default null,
   created_by uuid default null,
   description text default null,
@@ -3088,7 +3088,7 @@ create table prospects_cstm (
 );
 
 create table relationships (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   relationship_name varchar(150) default null,
   lhs_module varchar(100) default null,
   lhs_table varchar(64) default null,
@@ -3109,10 +3109,10 @@ create table relationships (
 create index idx_rel_name on relationships(relationship_name);
 
 create table releases (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   deleted boolean default null,
-  date_entered timestamptz default null,
-  date_modified timestamptz default null,
+  created_date timestamptz default null,
+  modified_date timestamptz default null,
   modified_user_id uuid default null,
   created_by uuid default null,
   name varchar(50) default null,
@@ -3123,10 +3123,10 @@ create table releases (
 create index idx_releases on releases(name,deleted);
 
 create table reminders (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   name varchar(255) default null,
-  date_entered timestamptz default null,
-  date_modified timestamptz default null,
+  created_date timestamptz default null,
+  modified_date timestamptz default null,
   modified_user_id uuid default null,
   created_by uuid default null,
   description text default null,
@@ -3149,10 +3149,10 @@ create index idx_reminder_related_event_module on reminders(related_event_module
 create index idx_reminder_related_event_module_id on reminders(related_event_module_id);
 
 create table reminders_invitees (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   name varchar(255) default null,
-  date_entered timestamptz default null,
-  date_modified timestamptz default null,
+  created_date timestamptz default null,
+  modified_date timestamptz default null,
   modified_user_id uuid default null,
   created_by uuid default null,
   description text default null,
@@ -3170,9 +3170,9 @@ create index idx_reminder_invitee_related_invitee_module on reminders_invitees(r
 create index idx_reminder_invitee_related_invitee_module_id on reminders_invitees(related_invitee_module_id);
 
 create table roles (
-  id uuid primary key,
-  date_entered timestamptz default null,
-  date_modified timestamptz default null,
+  id uuid primary key default gen_random_uuid(),
+  created_date timestamptz default null,
+  modified_date timestamptz default null,
   modified_user_id uuid default null,
   created_by uuid default null,
   name varchar(150) default null,
@@ -3184,11 +3184,11 @@ create table roles (
 create index idx_role_id_del on roles(id,deleted);
 
 create table roles_modules (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   role_id uuid default null,
   module_id uuid default null,
   allow boolean default false,
-  date_modified timestamptz default null,
+  modified_date timestamptz default null,
   deleted boolean default false
 );
 
@@ -3196,10 +3196,10 @@ create index idx_role_id on roles_modules(role_id);
 create index idx_module_id on roles_modules(module_id);
 
 create table roles_users (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   role_id uuid default null,
   user_id uuid default null,
-  date_modified timestamptz default null,
+  modified_date timestamptz default null,
   deleted boolean default false
 );
 
@@ -3207,12 +3207,12 @@ create index idx_ru_role_id on roles_users(role_id);
 create index idx_ru_user_id on roles_users(user_id);
 
 create table saved_search (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   name varchar(150) default null,
   search_module varchar(150) default null,
   deleted boolean default null,
-  date_entered timestamptz default null,
-  date_modified timestamptz default null,
+  created_date timestamptz default null,
+  modified_date timestamptz default null,
   assigned_user_id uuid default null,
   contents text default null,
   description text default null
@@ -3221,10 +3221,10 @@ create table saved_search (
 create index idx_desc on saved_search(name,deleted);
 
 create table schedulers (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   deleted boolean default false,
-  date_entered timestamptz default null,
-  date_modified timestamptz default null,
+  created_date timestamptz default null,
+  modified_date timestamptz default null,
   created_by uuid default null,
   modified_user_id uuid default null,
   name varchar(255) default null,
@@ -3242,10 +3242,10 @@ create table schedulers (
 create index idx_schedule on schedulers(date_time_start,deleted);
 
 create table securitygroups (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   name varchar(255) default null,
-  date_entered timestamptz default null,
-  date_modified timestamptz default null,
+  created_date timestamptz default null,
+  modified_date timestamptz default null,
   modified_user_id uuid default null,
   created_by uuid default null,
   description text default null,
@@ -3255,15 +3255,15 @@ create table securitygroups (
 );
 
 create table securitygroups_acl_roles (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   securitygroup_id uuid default null,
   role_id uuid default null,
-  date_modified timestamptz default null,
+  modified_date timestamptz default null,
   deleted boolean default false
 );
 
 create table securitygroups_audit (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   parent_id uuid not null,
   date_created timestamptz default null,
   created_by uuid default null,
@@ -3278,19 +3278,19 @@ create table securitygroups_audit (
 create index idx_securitygroups_parent_id on securitygroups_audit(parent_id);
 
 create table securitygroups_default (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   securitygroup_id uuid default null,
   module varchar(50) default null,
-  date_modified timestamptz default null,
+  modified_date timestamptz default null,
   deleted boolean default false
 );
 
 create table securitygroups_records (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   securitygroup_id uuid default null,
   record_id uuid default null,
   module varchar(100) default null,
-  date_modified timestamptz default null,
+  modified_date timestamptz default null,
   modified_user_id uuid default null,
   created_by uuid default null,
   deleted boolean default false
@@ -3300,8 +3300,8 @@ create index idx_securitygroups_records_mod on securitygroups_records(module,del
 create index idx_securitygroups_records_del on securitygroups_records(deleted,record_id,module,securitygroup_id);
 
 create table securitygroups_users (
-  id uuid primary key,
-  date_modified timestamptz default null,
+  id uuid primary key default gen_random_uuid(),
+  modified_date timestamptz default null,
   deleted boolean default false,
   securitygroup_id uuid default null,
   user_id uuid default null,
@@ -3315,10 +3315,10 @@ create index securitygroups_users_idxc on securitygroups_users(user_id,deleted,s
 create index securitygroups_users_idxd on securitygroups_users(user_id,deleted,securitygroup_id);
 
 create table sugarfeed (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   name varchar(255) default null,
-  date_entered timestamptz default null,
-  date_modified timestamptz default null,
+  created_date timestamptz default null,
+  modified_date timestamptz default null,
   modified_user_id uuid default null,
   created_by uuid default null,
   description text default null,
@@ -3330,13 +3330,13 @@ create table sugarfeed (
   link_type varchar(30) default null
 );
 
-create index sgrfeed_date on sugarfeed(date_entered,deleted);
+create index sgrfeed_date on sugarfeed(created_date,deleted);
 
 create table surveyquestionoptions (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   name varchar(255) default null,
-  date_entered timestamptz default null,
-  date_modified timestamptz default null,
+  created_date timestamptz default null,
+  modified_date timestamptz default null,
   modified_user_id uuid default null,
   created_by uuid default null,
   description text default null,
@@ -3347,7 +3347,7 @@ create table surveyquestionoptions (
 );
 
 create table surveyquestionoptions_audit (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   parent_id uuid not null,
   date_created timestamptz default null,
   created_by uuid default null,
@@ -3362,8 +3362,8 @@ create table surveyquestionoptions_audit (
 create index idx_surveyquestionoptions_parent_id on surveyquestionoptions_audit(parent_id);
 
 create table surveyquestionoptions_surveyquestionresponses (
-  id uuid primary key,
-  date_modified timestamptz default null,
+  id uuid primary key default gen_random_uuid(),
+  modified_date timestamptz default null,
   deleted boolean default false,
   surveyq72c7options_ida uuid default null,
   surveyq10d4sponses_idb uuid default null
@@ -3373,10 +3373,10 @@ create index surveyquestionoptions_surveyquestionresponses_alt on surveyquestion
 (surveyq72c7options_ida,surveyq10d4sponses_idb);
 
 create table surveyquestionresponses (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   name varchar(255) default null,
-  date_entered timestamptz default null,
-  date_modified timestamptz default null,
+  created_date timestamptz default null,
+  modified_date timestamptz default null,
   modified_user_id uuid default null,
   created_by uuid default null,
   description text default null,
@@ -3390,7 +3390,7 @@ create table surveyquestionresponses (
 );
 
 create table surveyquestionresponses_audit (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   parent_id uuid not null,
   date_created timestamptz default null,
   created_by uuid default null,
@@ -3405,10 +3405,10 @@ create table surveyquestionresponses_audit (
 create index idx_surveyquestionresponses_parent_id on surveyquestionresponses_audit(parent_id);
 
 create table surveyquestions (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   name varchar(255) default null,
-  date_entered timestamptz default null,
-  date_modified timestamptz default null,
+  created_date timestamptz default null,
+  modified_date timestamptz default null,
   modified_user_id uuid default null,
   created_by uuid default null,
   description text default null,
@@ -3421,7 +3421,7 @@ create table surveyquestions (
 );
 
 create table surveyquestions_audit (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   parent_id uuid not null,
   date_created timestamptz default null,
   created_by uuid default null,
@@ -3436,10 +3436,10 @@ create table surveyquestions_audit (
 create index idx_surveyquestions_parent_id on surveyquestions_audit(parent_id);
 
 create table surveyresponses (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   name varchar(255) default null,
-  date_entered timestamptz default null,
-  date_modified timestamptz default null,
+  created_date timestamptz default null,
+  modified_date timestamptz default null,
   modified_user_id uuid default null,
   created_by uuid default null,
   description text default null,
@@ -3454,7 +3454,7 @@ create table surveyresponses (
 );
 
 create table surveyresponses_audit (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   parent_id uuid not null,
   date_created timestamptz default null,
   created_by uuid default null,
@@ -3469,10 +3469,10 @@ create table surveyresponses_audit (
 create index idx_surveyresponses_parent_id on surveyresponses_audit(parent_id);;
 
 create table surveys (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   name varchar(255) default null,
-  date_entered timestamptz default null,
-  date_modified timestamptz default null,
+  created_date timestamptz default null,
+  modified_date timestamptz default null,
   modified_user_id uuid default null,
   created_by uuid default null,
   description text default null,
@@ -3486,7 +3486,7 @@ create table surveys (
 );
 
 create table surveys_audit (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   parent_id uuid not null,
   date_created timestamptz default null,
   created_by uuid default null,
@@ -3501,10 +3501,10 @@ create table surveys_audit (
 create index idx_surveys_parent_id on surveys_audit(parent_id);
 
 create table tasks (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   name varchar(50) default null,
-  date_entered timestamptz default null,
-  date_modified timestamptz default null,
+  created_date timestamptz default null,
+  modified_date timestamptz default null,
   modified_user_id uuid default null,
   created_by uuid default null,
   description text default null,
@@ -3528,10 +3528,10 @@ create index idx_task_assigned on tasks(assigned_user_id);
 create index idx_task_status on tasks(status);
 
 create table templatesectionline (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   name varchar(255) default null,
-  date_entered timestamptz default null,
-  date_modified timestamptz default null,
+  created_date timestamptz default null,
+  modified_date timestamptz default null,
   modified_user_id uuid default null,
   created_by uuid default null,
   description text default null,
@@ -3548,7 +3548,7 @@ create table tracker (
   module_name varchar(255) default null,
   item_id varchar(36) default null,
   item_summary varchar(255) default null,
-  date_modified timestamptz default null,
+  modified_date timestamptz default null,
   action varchar(255) default null,
   session_id varchar(36) default null,
   visible boolean default false,
@@ -3559,10 +3559,10 @@ create index idx_tracker_iid on tracker(item_id);
 create index idx_tracker_userid_vis_id on tracker(user_id,visible,id);
 create index idx_tracker_userid_itemid_vis on tracker(user_id,item_id,visible);
 create index idx_tracker_monitor_id on tracker(monitor_id);
-create index idx_tracker_date_modified on tracker(date_modified);
+create index idx_tracker_date_modified on tracker(modified_date);
 
 create table upgrade_history (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   filename varchar(255) default null,
   md5sum varchar(32) default null,
   type varchar(30) default null,
@@ -3572,18 +3572,18 @@ create table upgrade_history (
   description text default null,
   id_name varchar(255) default null,
   manifest text default null,
-  date_entered timestamptz default null,
+  created_date timestamptz default null,
   enabled boolean default true
 );
 
 create  unique index upgrade_history_md5_uk on upgrade_history(md5sum);
 
 create table user_preferences (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   category varchar(50) default null,
   deleted boolean default false,
-  date_entered timestamptz default null,
-  date_modified timestamptz default null,
+  created_date timestamptz default null,
+  modified_date timestamptz default null,
   assigned_user_id uuid default null,
   contents text default null
 );
@@ -3591,7 +3591,7 @@ create table user_preferences (
 create index idx_userprefnamecat on user_preferences(assigned_user_id,category);
 
 create table users (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   email varchar(255) not null,
   username varchar(64) not null,
   password_hash varchar(255) not null,
@@ -3643,14 +3643,14 @@ create table users_feeds (
   user_id uuid default null,
   feed_id uuid default null,
   rank int default null,
-  date_modified timestamptz default null,
+  modified_date timestamptz default null,
   deleted boolean default false
 );
 
 create index idx_ud_user_id on users_feeds(user_id,feed_id);
 
 create table users_last_import (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   assigned_user_id uuid default null,
   import_module varchar(36) default null,
   bean_type uuid default null,
@@ -3661,7 +3661,7 @@ create table users_last_import (
 create index idx_user_id on users_last_import(assigned_user_id);
 
 create table users_password_link (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   keyhash varchar(255) default null,
   user_id uuid default null,
   username varchar(36) default null,
@@ -3672,9 +3672,9 @@ create table users_password_link (
 create index idx_username on users_password_link(username);
 
 create table users_signatures (
-  id uuid primary key,
-  date_entered timestamptz default null,
-  date_modified timestamptz default null,
+  id uuid primary key default gen_random_uuid(),
+  created_date timestamptz default null,
+  modified_date timestamptz default null,
   deleted boolean default null,
   user_id uuid default null,
   name varchar(255) default null,
@@ -3685,10 +3685,10 @@ create table users_signatures (
 create index idx_usersig_uid on users_signatures(user_id);
 
 create table vcals (
-  id uuid primary key,
+  id uuid primary key default gen_random_uuid(),
   deleted boolean default null,
-  date_entered timestamptz default null,
-  date_modified timestamptz default null,
+  created_date timestamptz default null,
+  modified_date timestamptz default null,
   user_id uuid not null,
   type1 varchar(100) default null,
   source varchar(100) default null,

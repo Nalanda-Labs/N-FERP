@@ -26,14 +26,35 @@ async def main(email: str, password: str) -> int:
     ph = argon2.PasswordHasher()
     hash = ph.hash(password)
 
+    id = uuid4()
     await conn.execute(
-        'INSERT INTO users(id, email, password_hash, username) VALUES($1, $2, $3, $4)', uuid4(), email, hash, 'admin'
+        'INSERT INTO users(id, email, password_hash, username) VALUES($1, $2, $3, $4) returning id', id, email, hash, 'admin'
     )
 
+    print('Administrator successfully created with username "admin" having id', id)
+    with open('acl_actions.sql', 'r') as f:
+        for l in f.readlines():
+            line = l.format(id).strip()
+            if line:
+                await conn.execute(line)
+
+    with open('relationships.sql', 'r') as f:
+        for l in f.readlines():
+            line = l.strip()
+            if line:
+                await conn.execute(line)
+
+    with open('email_templates.sql', 'r') as f:
+        line = f.read()
+        if line:
+            await conn.execute(line.format(id))
+    
+    with open('fields_meta_data.sql', 'r') as f:
+        line = f.read()
+        if line:
+            await conn.execute(line)
+
     await conn.close()
-
-    print('Administrator successfully created with username "admin"')
-
     return 0
 
 
