@@ -28,7 +28,7 @@ async def main(email: str, password: str) -> int:
 
     id = uuid4()
     await conn.execute(
-        'INSERT INTO users(id, email, password_hash, username) VALUES($1, $2, $3, $4) returning id', id, email, hash, 'admin'
+        'INSERT INTO users(id, email, password_hash, username, is_admin) VALUES($1, $2, $3, $4, $5) returning id', id, email, hash, 'admin', True
     )
 
     print('Administrator successfully created with username "admin" having id', id)

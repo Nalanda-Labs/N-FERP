@@ -3601,7 +3601,7 @@ create table users (
   sugar_login boolean default true,
   first_name varchar(255) default '',
   last_name varchar(255) default '',
-  is_admin boolean default false,
+  is_admin boolean default not null false,
   external_auth_only boolean default false,
   receive_notifications boolean default true,
   description text default null,

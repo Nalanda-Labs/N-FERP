@@ -21,6 +21,7 @@ pub struct User {
     pub password_hash: String,
     pub created_date: SqlDateTime,
     pub modified_date: SqlDateTime,
+    pub is_admin: bool
 }
 
 #[derive(Serialize, Deserialize, Debug)]

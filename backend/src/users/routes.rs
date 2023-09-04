@@ -15,6 +15,7 @@ use uuid::Uuid;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct LoginResponse {
+    pub user: User,
     pub success: bool,
 }
 
@@ -104,7 +105,7 @@ async fn login(form: web::types::Json<Login>, state: AppState) -> impl Responder
                         .http_only(true)
                         .finish();
 
-                let r = LoginResponse { success: true };
+                let r = LoginResponse { user, success: true };
                 let resp = match serde_json::to_string(&r) {
                     Ok(json) => HttpResponse::Ok()
                         .cookie(access_cookie)
@@ -182,7 +183,7 @@ async fn refresh_access_token_handler(
 
     let user_id_uuid = Uuid::parse_str(&user_id).unwrap();
     let query_result = sqlx::query_as!(User, 
-        "SELECT id, first_name, last_name, username, email, password_hash, created_date, modified_date FROM users WHERE id = $1",
+        "SELECT id, first_name, last_name, username, email, password_hash, created_date, modified_date, is_admin FROM users WHERE id = $1",
         user_id_uuid)
         .fetch_optional(&state.sql)
         .await

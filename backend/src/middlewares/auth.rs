@@ -30,6 +30,7 @@ impl fmt::Display for ErrorResponse {
 
 #[derive(Debug)]
 pub struct AuthorizationService {
+    pub user: User,
     pub xsrf_token: String,
 }
 
@@ -105,7 +106,7 @@ impl<Err> FromRequest<Err> for AuthorizationService {
 
             let query_result =
                 sqlx::query_as!(User, 
-                    "SELECT id, first_name, last_name, username, email, password_hash, created_date, modified_date FROM users WHERE id = $1",
+                    "SELECT id, first_name, last_name, username, email, password_hash, created_date, modified_date, is_admin FROM users WHERE id = $1",
                     uuid::Uuid::parse_str(&user_id).unwrap()
                 )
                 .fetch_optional(&state.sql)
@@ -131,7 +132,8 @@ impl<Err> FromRequest<Err> for AuthorizationService {
         };
 
         match block_on(user_exists_result) {
-            Ok(_user) => ready(Ok(AuthorizationService {
+            Ok(user) => ready(Ok(AuthorizationService {
+                user,
                 xsrf_token: access_token_uuid.to_string(),
             })),
             Err(e) => ready(Err(e.into()

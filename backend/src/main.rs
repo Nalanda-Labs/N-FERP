@@ -11,6 +11,7 @@ pub mod config;
 pub mod middlewares;
 pub mod state;
 pub mod users;
+pub mod utils;
 
 use config::{Config, Opts};
 

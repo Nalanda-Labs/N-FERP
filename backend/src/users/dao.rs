@@ -14,7 +14,7 @@ pub trait IUser: std::ops::Deref<Target = AppStateRaw> {
 impl IUser for &AppStateRaw {
     async fn user_query(&self, email: &str) -> sqlx::Result<User> {
         let user = sqlx::query_as!(User,
-            "SELECT id, first_name, last_name, username, email, password_hash, created_date, modified_date
+            "SELECT id, first_name, last_name, username, email, password_hash, created_date, modified_date, is_admin
             FROM users
             where email = $1",
             email
