@@ -21,7 +21,7 @@ default-features = false
 features = [ "runtime-tokio", "macros", "chrono", "uuid", "json", "time" ]
 
 [dependencies]
-ntex = { version = "0.7", features = ["glommio", "cookie"]}
+ntex = { version = "0.7", features = ["tokio", "cookie"]}
 clap =  { version = "4.3.19", features = [ "derive" ] }
 lettre = { version = "0.10.4", features = ["tokio1-native-tls", "hostname", "builder"] }
 nonblock-logger = { version = "0.2.2", default-features = false, features = ["color", "dbg"] }

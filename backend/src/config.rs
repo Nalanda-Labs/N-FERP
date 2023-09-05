@@ -73,7 +73,7 @@ impl Config {
 // #[clap(version = version_with_gitif())]
 pub struct Opts {
     // The number of occurrences of the `v/verbose` flag
-    /// Verbose mode (-v, -vv, -vvv, etc.)
+    // Verbose mode (-v, -vv, -vvv, etc.)
     #[clap(short, long)]
     pub verbose: u8,
 
