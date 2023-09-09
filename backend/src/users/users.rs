@@ -10,6 +10,7 @@ fn passhash_verify(pass: &str, hash: &str) -> bool {
 type SqlDateTime = chrono::DateTime<Utc>;
 
 #[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
 pub struct User {
     pub id: Uuid,
     pub first_name: String,

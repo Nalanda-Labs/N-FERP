@@ -24,6 +24,7 @@ async fn login(form: web::types::Json<Login>, state: AppState) -> impl Responder
     let form = form.into_inner();
 
     // todo: distable login for deleted and blocked users
+    // define a new structure for user response to not include password hash
     match state.get_ref().user_query(&form.email).await {
         Ok(user) => {
             info!("find user {:?} ok: {:?}", form, user);
@@ -105,13 +106,13 @@ async fn login(form: web::types::Json<Login>, state: AppState) -> impl Responder
                         .http_only(true)
                         .finish();
 
-                let r = LoginResponse { user, success: true };
+                let r: LoginResponse = LoginResponse { user, success: true };
                 let resp = match serde_json::to_string(&r) {
                     Ok(json) => HttpResponse::Ok()
                         .cookie(access_cookie)
                         .cookie(refresh_cookie)
                         .cookie(
-                            Cookie::build("logged_in", "true")
+                            Cookie::build("logged_in", json)
                                 .domain(&state.config.host)
                                 .path("/")
                                 .secure(true)
@@ -119,7 +120,7 @@ async fn login(form: web::types::Json<Login>, state: AppState) -> impl Responder
                                 .finish(),
                         )
                         .content_type("application/json")
-                        .body(json),
+                        .body(""),
                     Err(e) => Error::from(e).into(),
                 };
                 resp

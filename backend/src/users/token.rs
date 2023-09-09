@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 #[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct TokenDetails {
     pub token: Option<String>,
     pub token_uuid: uuid::Uuid,
@@ -11,6 +12,7 @@ pub struct TokenDetails {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct TokenClaims {
     pub sub: String,
     pub token_uuid: String,

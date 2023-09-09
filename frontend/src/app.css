@@ -1,0 +1,12 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+a {
+    color: #3681F3;
+}
+
+button {
+    color: #fff;
+    background-color: #3681F3!important;
+}
