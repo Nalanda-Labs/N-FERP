@@ -4,12 +4,9 @@ use crate::middlewares::auth;
 use crate::state::AppState;
 use crate::users::token;
 use cookie::time::Duration;
-use cookie::Cookie;
 use mobc_redis::redis::{self, AsyncCommands};
 use nonblock_logger::{debug, info};
-use ntex::http::HttpMessage;
-use ntex::web;
-use ntex::web::{get, post, Error, HttpRequest, HttpResponse, Responder};
+use actix_web::{cookie::Cookie, get, post, web, Error, HttpResponse, HttpRequest, Responder};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -20,11 +17,10 @@ pub struct LoginResponse {
 }
 
 #[post("/auth/login")]
-async fn login(form: web::types::Json<Login>, state: AppState) -> impl Responder {
+async fn login(form: web::Json<Login>, state: AppState) -> impl Responder {
     let form = form.into_inner();
 
     // todo: distable login for deleted and blocked users
-    // define a new structure for user response to not include password hash
     match state.get_ref().user_query(&form.email).await {
         Ok(user) => {
             info!("find user {:?} ok: {:?}", form, user);
@@ -241,7 +237,7 @@ async fn refresh_access_token_handler(
         .json(&serde_json::json!({"status": "success", "access_token": access_token_details.token.unwrap()}))
 }
 
-#[get("/auth/logout")]
+#[post("/auth/logout")]
 async fn logout_handler(
     req: HttpRequest,
     auth_guard: auth::AuthorizationService,

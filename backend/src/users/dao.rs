@@ -1,4 +1,5 @@
 use async_trait::async_trait;
+use nonblock_logger::info;
 use sqlx::Error;
 
 use super::users::*;
@@ -16,7 +17,7 @@ impl IUser for &AppStateRaw {
         let user = sqlx::query_as!(User,
             "SELECT id, first_name, last_name, username, email, password_hash, created_date, modified_date, is_admin
             FROM users
-            where email = $1",
+            where email = $1 and deleted=false",
             email
         )
         .fetch_optional(&self.sql)
@@ -29,6 +30,7 @@ impl IUser for &AppStateRaw {
             }
         };
 
+        info!("User found   ");
         Ok(user)
     }
 }

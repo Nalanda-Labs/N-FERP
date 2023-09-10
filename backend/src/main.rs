@@ -3,7 +3,8 @@ extern crate serde;
 extern crate sqlx;
 extern crate validator;
 
-use ntex::{web, web::App, web::HttpServer};
+use actix_cors::Cors;
+use actix_web::{middleware, web, App, HttpServer};
 use num_cpus;
 
 // pub mod accounts;
@@ -15,7 +16,7 @@ pub mod utils;
 
 use config::{Config, Opts};
 
-#[ntex::main]
+#[actix_rt::main]
 async fn main() -> std::io::Result<()> {
     Config::show();
     let (_handle, opt) = Opts::parse_from_args();
@@ -25,13 +26,22 @@ async fn main() -> std::io::Result<()> {
 
     HttpServer::new(move || {
         App::new()
-            .state(state.clone())
-            // we will not be sending JSON data of more than 10KB so compression is not used
-            .wrap(web::middleware::Logger::default())
+            .wrap(
+                Cors::default()
+                    .allowed_origin("http://localhost:5173")
+                    .allow_any_header()
+                    .allow_any_method()
+                    .supports_credentials()
+                    .max_age(3600),
+            )
+            .app_data(web::Data::new(state.clone()))
+            .app_data(state.clone())
+            .wrap(middleware::Logger::default())
+            .wrap(middleware::Compress::default())
             .service(web::scope(apiv1).configure(users::routes::init))
     })
     .workers(num_cpus::get())
-    .keep_alive(300)
+    .keep_alive(std::time::Duration::from_secs(300))
     .bind(&state2.config.listen)?
     .run()
     .await

@@ -7,10 +7,10 @@ declare global {
 			user: {
 				email: String,
 				username: String,
-				first_name: String,
-				last_name: String,
-				is_admin: Boolean
-			},
+				firstName: String,
+				lastName: String,
+				isAdmin: Boolean
+			} | null,
 			accessToken: {
 				token: String,
 				tokenUuid: String,
@@ -22,9 +22,9 @@ declare global {
 			user: {
 				email: String,
 				username: String,
-				first_name: String,
-				last_name: String,
-				is_admin: Boolean
+				firstName: String,
+				lastName: String,
+				isAdmin: Boolean
 			}
 		}
 		// interface Platform {}

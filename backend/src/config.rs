@@ -44,6 +44,7 @@ impl Config {
         let kvm =
             RedisConnectionManager::new(Client::open(self.redis.clone()).expect("redis open"));
         let kv = KvPool::builder().build(kvm);
+        kv.set_max_idle_conns(100).await;
 
         Arc::new(State {
             config: self,

@@ -3,8 +3,8 @@ import { error } from '@sveltejs/kit';
 // change this to point it to a different host
 const base = 'http://localhost:8000/api/v1';
 
-async function send({ method, path, data, xsrf_token }) {
-	const opts = { method, headers: {} };
+async function send({ method, path, data, xsrf_token, headers }) {
+	const opts = { method, headers: {}, credentials: 'include' };
 
 	if (data) {
 		opts.headers['Content-Type'] = 'application/json';
@@ -12,10 +12,18 @@ async function send({ method, path, data, xsrf_token }) {
 	}
 
 	if (xsrf_token) {
-		opts.headers['X_XSRF-TOKEN'] = xsrf_token;
+		opts.headers['X-XSRF-TOKEN'] = xsrf_token;
 	}
 
+	if (headers) {
+		for (const [key, value] of headers.entries()) {
+			if (key === 'cookie') {
+				opts.headers[key] = value;
+			}
+		  }
+	}
 	const res = await fetch(`${base}/${path}`, opts);
+	
 	if (res.ok || res.status === 422) {
 		return res;
 	}
@@ -23,18 +31,18 @@ async function send({ method, path, data, xsrf_token }) {
 	throw error(res.status);
 }
 
-export function get(path, xsrf_token) {
-	return send({ method: 'GET', path, xsrf_token });
+export function get(path, xsrf_token, headers) {
+	return send({ method: 'GET', path, xsrf_token, headers });
 }
 
-export function del(path, xsrf_token) {
-	return send({ method: 'DELETE', path, xsrf_token });
+export function del(path, xsrf_token, headers) {
+	return send({ method: 'DELETE', path, xsrf_token, headers });
 }
 
-export function post(path, data, xsrf_token) {
-	return send({ method: 'POST', path, data, xsrf_token });
+export function post(path, data, xsrf_token, headers) {
+	return send({ method: 'POST', path, data, xsrf_token, headers });
 }
 
-export function put(path, data, xsrf_token) {
-	return send({ method: 'PUT', path, data, xsrf_token });
+export function put(path, data, xsrf_token, headers) {
+	return send({ method: 'PUT', path, data, xsrf_token, headers });
 }

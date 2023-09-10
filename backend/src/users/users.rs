@@ -28,9 +28,7 @@ pub struct User {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Login {
     pub email: String,
-    pub password: String,
-    #[serde(default)]
-    pub rememberme: bool,
+    pub password: String
 }
 
 impl Login {

@@ -2,9 +2,9 @@ use core::fmt;
 use async_trait::async_trait;
 use futures::executor::block_on;
 use mobc_redis::redis::AsyncCommands;
-use ntex::http::HttpMessage;
+use nonblock_logger::info;
 use std::future::{ready, Ready};
-use ntex::web::{FromRequest, HttpRequest};
+use actix_web::{FromRequest, HttpRequest, dev};
 use serde::{Deserialize, Serialize};
 
 use crate::state::AppStateRaw;
@@ -35,12 +35,12 @@ pub struct AuthorizationService {
 }
 
 #[async_trait]
-impl<Err> FromRequest<Err> for AuthorizationService {
-    type Error = ntex::web::Error;
+impl FromRequest for AuthorizationService {
+    type Error = actix_web::Error;
     type Future = Ready<Result<AuthorizationService, Self::Error>>;
 
-    fn from_request(req: &HttpRequest, _payload: &mut ntex::http::Payload) -> Self::Future {
-        let state = req.app_state::<AppStateRaw>().expect("get AppStateRaw");
+    fn from_request(req: &HttpRequest, _payload: &mut dev::Payload) -> Self::Future {
+        let state = req.app_data::<AppStateRaw>().expect("get AppStateRaw");
 
         let xsrf_token_header = req
             .headers()
@@ -50,39 +50,50 @@ impl<Err> FromRequest<Err> for AuthorizationService {
         let xsrf_token = match xsrf_token_header {
             Some(x) => x.to_owned(),
             None => {
-                return ready(Err(ntex::web::error::ErrorBadRequest("Wrong XSRF token.").into()));
+                return ready(Err(actix_web::error::ErrorBadRequest("Wrong XSRF token.").into()));
             }
         };
 
-        let access_token = match req.cookie("access_token") {
+        let mut access_token = match req.cookie("access_token") {
             Some(c) => c.to_string(),
             None => {
-                return ready(Err(ntex::web::error::ErrorBadRequest("Wrong XSRF token.").into()));
+                info!("semi step 2");
+                return ready(Err(actix_web::error::ErrorBadRequest("Wrong XSRF token.").into()));
             }
         };
 
+        access_token = match access_token.split_once("=") {
+            Some(v) => v.1.to_owned(),
+            None => {
+                return ready(Err(actix_web::error::ErrorBadRequest("Wrong access token.").into()));
+            }
+        };
+
+        info!("{:?}", access_token);
         let access_token_details = match token::verify_jwt_token(
             state.config.access_token_public_key.to_owned(),
             &access_token,
         ) {
             Ok(token_details) => token_details,
-            Err(_) => {
-                return ready(Err(ntex::web::error::ErrorUnauthorized("Unauthorized.").into()));
+            Err(e) => {
+                return ready(Err(actix_web::error::ErrorUnauthorized(e).into()));
             }
         };
 
+        info!("step 3");
         let access_token_uuid =
             uuid::Uuid::parse_str(&access_token_details.token_uuid.to_string()).unwrap();
         
         if xsrf_token != access_token_uuid.clone().to_string() {
-            return ready(Err(ntex::web::error::ErrorBadRequest("Wrong XSRF token.").into()));
+            return ready(Err(actix_web::error::ErrorBadRequest("Wrong XSRF token.").into()));
         }
 
+        info!("step 4");
         let user_id_redis_result = async move {
             let mut redis_client = match state.kv.get().await {
                 Ok(redis_client) => redis_client,
                 Err(e) => {
-                    return Err(ntex::web::error::ErrorInternalServerError(ErrorResponse {
+                    return Err(actix_web::error::ErrorInternalServerError(ErrorResponse {
                         status: "fail".to_string(),
                         message: format!("Could not connect to Redis: {}", e),
                     }));
@@ -94,7 +105,7 @@ impl<Err> FromRequest<Err> for AuthorizationService {
                 .await
             {
                 Ok(value) => Ok(value),
-                Err(e) => Err(ntex::web::error::ErrorUnauthorized(ErrorResponse {
+                Err(e) => Err(actix_web::error::ErrorUnauthorized(ErrorResponse {
                     status: "fail".to_string(),
                     message: format!("Token is invalid or session has expired: {:?}", e),
                 })),
@@ -106,7 +117,7 @@ impl<Err> FromRequest<Err> for AuthorizationService {
 
             let query_result =
                 sqlx::query_as!(User, 
-                    "SELECT id, first_name, last_name, username, email, password_hash, created_date, modified_date, is_admin FROM users WHERE id = $1",
+                    "SELECT id, first_name, last_name, username, email, password_hash, created_date, modified_date, is_admin FROM users WHERE id = $1 and deleted=false",
                     uuid::Uuid::parse_str(&user_id).unwrap()
                 )
                 .fetch_optional(&state.sql)
@@ -119,14 +130,14 @@ impl<Err> FromRequest<Err> for AuthorizationService {
                         status: "fail".to_string(),
                         message: "the user belonging to this token no logger exists".to_string(),
                     };
-                    Err(ntex::web::error::ErrorUnauthorized(json_error))
+                    Err(actix_web::error::ErrorUnauthorized(json_error))
                 }
                 Err(e) => {
                     let json_error = ErrorResponse {
                         status: "error".to_string(),
                         message: format!("Faled to check user existence: {:?}", e),
                     };
-                    Err(ntex::web::error::ErrorInternalServerError(json_error))
+                    Err(actix_web::error::ErrorInternalServerError(json_error))
                 }
             }
         };

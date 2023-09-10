@@ -8,7 +8,7 @@ export async function load({ locals }) {
 
 /** @type {import('./$types').Actions} */
 export const actions = {
-	default: async ({ cookies, request }) => {
+	login: async ({ cookies, request }) => {
 		const data = await request.formData();
 
 		const resp = await api.post('auth/login', {
