@@ -1,5 +1,5 @@
 /** @type {import('./$types').LayoutServerLoad} */
-export function load({ locals }) {
+export function load({ locals}) {
     return {
         user: locals.user && {
             username: locals.user.username,
@@ -7,6 +7,7 @@ export function load({ locals }) {
             firstName: locals.user.firstName,
             lastName: locals.user.lastName,
             isAdmin: locals.user.isAdmin
-        }
+        },
+        locals
     };
 }

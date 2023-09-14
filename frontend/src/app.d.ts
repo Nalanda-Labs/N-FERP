@@ -25,7 +25,7 @@ declare global {
 				firstName: String,
 				lastName: String,
 				isAdmin: Boolean
-			}
+			} | null
 		}
 		// interface Platform {}
 	}

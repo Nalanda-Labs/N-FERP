@@ -35,7 +35,6 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"cookie": "^0.5.0",
 		"flowbite": "^1.8.1",
 		"jwt-decode": "^3.1.2"
 	}

@@ -110,6 +110,7 @@ impl FromRequest for AuthorizationService {
                     message: format!("Token is invalid or session has expired: {:?}", e),
                 })),
             }
+
         };
 
         let user_exists_result = async move {
