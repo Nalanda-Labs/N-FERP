@@ -9,12 +9,25 @@
 	import * as api from '../lib/api.js';
 	import { browser } from '$app/environment';
 	import '../app.css';
+	import { goto } from '$app/navigation';
 
 	onMount(async () => {
+		// this immediate refresh is for the reason when user will close the
+		// browser and reopen it which can lead to three cases for both
+		// the access token and refresh token
+		const resp = await api.get('auth/refresh', {});
+
+		if (resp.status === 403) {
+			goto('/');
+		}
+
 		const refresh = setInterval(async () => {
 			if (browser) {
-				// TODO: Implement refresh token handling
-				// the time for access token is 15 min.
+				const resp = await api.get('auth/refresh', {});
+
+				if (resp.status === 403) {
+					goto('/');
+				}
 				// TODO: remove this hardcoding
 			}
 		}, 10000);

@@ -31,6 +31,7 @@ export const actions = {
 		}
 
 		locals.user = null;
+		locals.accessToken = null;
 
 		throw redirect(307, '/');
 	}

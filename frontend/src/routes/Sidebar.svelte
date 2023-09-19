@@ -10,9 +10,9 @@
 	<SidebarWrapper>
 		<SidebarGroup>
 			<SidebarItem label="Dashboard" active={activeUrl === '/dashboard'} href="/dashboard" />
-			<!-- {#if $page.data.user.isAdmin} -->
-			<SidebarItem label="Administration" active={activeUrl ==='/administration'} href="/administration" />
-			<!-- {/if} -->
+			{#if $page.data.user && $page.data.user.isAdmin}
+			<SidebarItem label="Adminstration" href="/adminstration" />
+			{/if}
 			<form use:enhance method="POST" action="/logout" style="margin-left:20px"><button type="submit">Sign Out</button></form>
 		</SidebarGroup>
 	</SidebarWrapper>

@@ -1,4 +1,5 @@
 import { error } from '@sveltejs/kit';
+import jwt_decode from "jwt-decode";
 
 // change this to point it to a different host
 const base = 'http://localhost:8000/api/v1';
@@ -15,15 +16,20 @@ async function send({ method, path, data, xsrf_token, headers }) {
 		opts.headers['X-XSRF-TOKEN'] = xsrf_token;
 	}
 
+	// this is needed so that cookies are set when request originate from server
 	if (headers) {
 		for (const [key, value] of headers.entries()) {
 			if (key === 'cookie') {
 				opts.headers[key] = value;
 			}
-		  }
+		}
 	}
+
+	// this is needed so that cookies are set when request originate from browser
+	opts.credentials = 'include';
+
 	const res = await fetch(`${base}/${path}`, opts);
-	
+
 	if (res.ok || res.status === 422) {
 		return res;
 	}
