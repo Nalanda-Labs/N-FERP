@@ -17,66 +17,64 @@ Aministration
 
 
 <main class="bg-gray-100 h-screen overflow-hidden relative">
-	<div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-4 my-4">
+    <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-4 my-4">
         {#each list as content}
-		<div>
-			<div class="shadow-lg px-4 py-6 w-full bg-white relative">
+        <div>
+            <div class="shadow-lg px-4 py-6 w-full bg-white relative">
                 <!-- {#each list as content} -->
-				<p
-					class="text-sm w-max text-gray-700 font-semibold border-b border-gray-200"
-				>
-					{content.heading}
-				</p>
-				<div class="flex items-end space-x-2 my-6">					
-				</div>
-				<div>
-					<div
-						class="flex items-center pb-2 mb-2 text-sm sm:space-x-12  justify-between border-b border-gray-200"
-					>
+                <p
+                    class="text-sm w-max text-gray-700 font-semibold border-b border-gray-200"
+                >
+                    {content.heading}
+                </p>
+                <div class="flex items-end space-x-2 my-6">
+                </div>
+                <div>
+                    <div
+                        class="flex items-center pb-2 mb-2 text-sm sm:space-x-12  justify-between border-b border-gray-200">
                         <a href="/administration/users">
                             <p>{content.content1}</p>
                         </a>
-					</div>
+                    </div>
 
-					<div
-						class="flex items-center mb-2 pb-2 text-sm space-x-12 md:space-x-24 justify-between border-b border-gray-200"
-					>
+                    <div
+                        class="flex items-center mb-2 pb-2 text-sm space-x-12 md:space-x-24 justify-between border-b border-gray-200">
                         <a href="/#">
                             <p>{content.content2}</p>
-                        </a>		
-					</div>
-					<div class="lex items-center mb-2 pb-2 text-sm space-x-12 md:space-x-24 justify-between border-b border-gray-200">
+                        </a>
+                    </div>
+                    <div class="lex items-center mb-2 pb-2 text-sm space-x-12 md:space-x-24 justify-between border-b border-gray-200">
                         <a href="/#">
                             <p>{content.content3}</p>
-                        </a>	
-					</div>
+                        </a>
+                    </div>
 
                     <div class="lex items-center mb-2 pb-2 text-sm space-x-12 md:space-x-24 justify-between border-b border-gray-200">
                         <a href="/#">
                             <p>{content.content4}</p>
                         </a>
-					</div>
+                    </div>
 
-                    <div class="lex items-center mb-2 pb-2 text-sm space-x-12 md:space-x-24 justify-between border-b border-gray-200">	
+                    <div class="lex items-center mb-2 pb-2 text-sm space-x-12 md:space-x-24 justify-between border-b border-gray-200">
                         <a href="/#">
                             <p>{content.content5}</p>
-                        </a> 
-					</div>
+                        </a>
+                    </div>
 
-                    <div class="lex items-center mb-2 pb-2 text-sm space-x-12 md:space-x-24 justify-between border-b border-gray-200">	
+                    <div class="lex items-center mb-2 pb-2 text-sm space-x-12 md:space-x-24 justify-between border-b border-gray-200">
                         <a href="/#">
                             <p>{content.content6}</p>
                         </a>
-					</div>
+                    </div>
 
                     <div class="lex items-center mb-2 pb-2 text-sm space-x-12 md:space-x-24 justify-between border-b border-gray-200">
                         <a href="/#">
                             <p>{content.content7}</p>
-                        </a>	
-					</div>
-				</div>  
-			</div>
-		</div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
          {/each}
-	</div>
+    </div>
 </main>
