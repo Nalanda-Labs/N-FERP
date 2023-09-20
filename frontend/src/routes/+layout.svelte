@@ -30,7 +30,7 @@
 				}
 				// TODO: remove this hardcoding
 			}
-		}, 10000);
+		}, 10 * 60 * 1000);
 		return async () => await refresh;
 	});
 </script>

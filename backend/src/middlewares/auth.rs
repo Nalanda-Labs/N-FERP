@@ -118,7 +118,8 @@ impl FromRequest for AuthorizationService {
 
             let query_result =
                 sqlx::query_as!(User, 
-                    "SELECT id, first_name, last_name, username, email, password_hash, created_date, modified_date, is_admin FROM users WHERE id = $1 and deleted=false",
+                    "SELECT id, first_name, last_name, username, email, password_hash, created_date, modified_date,
+                    is_admin, status, department FROM users WHERE id = $1 and deleted=false",
                     uuid::Uuid::parse_str(&user_id).unwrap()
                 )
                 .fetch_optional(&state.sql)
