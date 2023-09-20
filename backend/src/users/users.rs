@@ -22,17 +22,32 @@ pub struct User {
     pub password_hash: String,
     pub created_date: SqlDateTime,
     pub modified_date: SqlDateTime,
-    pub is_admin: bool
+    pub is_admin: bool,
+    pub status: String,
+    pub department: String,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Login {
     pub email: String,
-    pub password: String
+    pub password: String,
 }
 
 impl Login {
     pub fn verify(&self, hash: &str) -> bool {
         passhash_verify(&self.password, hash)
     }
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct UsersRequest {
+    pub sort_by: String,
+    pub last_record: String,
+    pub ascending: bool,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct UsersResponse {
+    pub users: Vec<User>,
+    pub count: u64,
 }

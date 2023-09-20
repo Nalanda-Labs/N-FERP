@@ -9,6 +9,7 @@ use mobc_redis::redis::{self, AsyncCommands};
 use nonblock_logger::{debug, info};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
+use serde_json::json;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct LoginResponse {
@@ -34,7 +35,7 @@ async fn login(form: web::Json<Login>, state: AppState) -> impl Responder {
                     Ok(token_details) => token_details,
                     Err(e) => {
                         return HttpResponse::BadGateway().json(
-                            &serde_json::json!({"status": "fail", "message": format_args!("{}", e)}),
+                            &json!({"status": "fail", "message": format_args!("{}", e)}),
                         );
                     }
                 };
@@ -47,7 +48,7 @@ async fn login(form: web::Json<Login>, state: AppState) -> impl Responder {
                     Ok(token_details) => token_details,
                     Err(e) => {
                         return HttpResponse::BadGateway().json(
-                            &serde_json::json!({"status": "fail", "message": format_args!("{}", e)}),
+                            &json!({"status": "fail", "message": format_args!("{}", e)}),
                         );
                     }
                 };
@@ -56,7 +57,7 @@ async fn login(form: web::Json<Login>, state: AppState) -> impl Responder {
                     Ok(redis_client) => redis_client,
                     Err(e) => {
                         return HttpResponse::InternalServerError().json(
-                            &serde_json::json!({"status": "fail", "message": format_args!("{}", e)}),
+                            &json!({"status": "fail", "message": format_args!("{}", e)}),
                         );
                     }
                 };
@@ -71,7 +72,7 @@ async fn login(form: web::Json<Login>, state: AppState) -> impl Responder {
 
                 if let Err(e) = access_result {
                     return HttpResponse::UnprocessableEntity().json(
-                        &serde_json::json!({"status": "error", "message": format_args!("{}", e)}),
+                        &json!({"status": "error", "message": format_args!("{}", e)}),
                     );
                 }
 
@@ -85,7 +86,7 @@ async fn login(form: web::Json<Login>, state: AppState) -> impl Responder {
 
                 if let Err(e) = refresh_result {
                     return HttpResponse::UnprocessableEntity().json(
-                        &serde_json::json!({"status": "error", "message": format_args!("{}", e)}),
+                        &json!({"status": "error", "message": format_args!("{}", e)}),
                     );
                 }
 
@@ -150,7 +151,7 @@ async fn refresh_access_token_handler(req: HttpRequest, state: AppState) -> impl
         None => {
             info!("step 1");
             return HttpResponse::Forbidden()
-                .json(&serde_json::json!({"status": "fail", "message": message}));
+                .json(&json!({"status": "fail", "message": message}));
         }
     };
 
@@ -162,7 +163,7 @@ async fn refresh_access_token_handler(req: HttpRequest, state: AppState) -> impl
         Err(e) => {
             info!("step 2");
             return HttpResponse::Forbidden()
-                .json(&serde_json::json!({"status": "fail", "message": format_args!("{:?}", e)}));
+                .json(&json!({"status": "fail", "message": format_args!("{:?}", e)}));
         }
     };
 
@@ -172,7 +173,7 @@ async fn refresh_access_token_handler(req: HttpRequest, state: AppState) -> impl
         Err(e) => {
             info!("step 3");
             return HttpResponse::Forbidden().json(
-                &serde_json::json!({"status": "fail", "message": format!("Could not connect to Redis: {}", e)}),
+                &json!({"status": "fail", "message": format!("Could not connect to Redis: {}", e)}),
             );
         }
     };
@@ -185,13 +186,14 @@ async fn refresh_access_token_handler(req: HttpRequest, state: AppState) -> impl
         Err(e) => {
             info!("step 4");
             return HttpResponse::Forbidden()
-                .json(&serde_json::json!({"status": "fail", "message": e.to_string()}));
+                .json(&json!({"status": "fail", "message": e.to_string()}));
         }
     };
 
     let user_id_uuid = Uuid::parse_str(&user_id).unwrap();
     let query_result = sqlx::query_as!(User, 
-        "SELECT id, first_name, last_name, username, email, password_hash, created_date, modified_date, is_admin FROM users WHERE id = $1",
+        "SELECT id, first_name, last_name, username, email, password_hash, created_date,
+        modified_date, is_admin, status, department FROM users WHERE id = $1",
         user_id_uuid)
         .fetch_optional(&state.sql)
         .await
@@ -199,7 +201,7 @@ async fn refresh_access_token_handler(req: HttpRequest, state: AppState) -> impl
 
     if query_result.is_none() {
         return HttpResponse::Forbidden()
-            .json(&serde_json::json!({"status": "fail", "message": "the user belonging to this token no logger exists"}));
+            .json(&json!({"status": "fail", "message": "the user belonging to this token no logger exists"}));
     }
 
     let user = query_result.unwrap();
@@ -212,7 +214,7 @@ async fn refresh_access_token_handler(req: HttpRequest, state: AppState) -> impl
         Ok(token_details) => token_details,
         Err(e) => {
             return HttpResponse::BadGateway()
-                .json(&serde_json::json!({"status": "fail", "message": format_args!("{:?}", e)}));
+                .json(&json!({"status": "fail", "message": format_args!("{:?}", e)}));
         }
     };
 
@@ -224,7 +226,7 @@ async fn refresh_access_token_handler(req: HttpRequest, state: AppState) -> impl
         Ok(token_details) => token_details,
         Err(e) => {
             return HttpResponse::BadGateway()
-                .json(&serde_json::json!({"status": "fail", "message": format_args!("{}", e)}));
+                .json(&json!({"status": "fail", "message": format_args!("{}", e)}));
         }
     };
 
@@ -238,7 +240,7 @@ async fn refresh_access_token_handler(req: HttpRequest, state: AppState) -> impl
 
     if redis_result.is_err() {
         return HttpResponse::UnprocessableEntity().json(
-            &serde_json::json!({"status": "error", "message": format_args!("{:?}", redis_result.unwrap_err())}),
+            &json!({"status": "error", "message": format_args!("{:?}", redis_result.unwrap_err())}),
         );
     }
     
@@ -252,7 +254,7 @@ async fn refresh_access_token_handler(req: HttpRequest, state: AppState) -> impl
 
     if redis_result.is_err() {
         return HttpResponse::UnprocessableEntity().json(
-            &serde_json::json!({"status": "error", "message": format_args!("{:?}", redis_result.unwrap_err())}),
+            &json!({"status": "error", "message": format_args!("{:?}", redis_result.unwrap_err())}),
         );
     }
 
@@ -310,7 +312,7 @@ async fn logout_handler(
         Some(c) => c.value().to_string(),
         None => {
             return HttpResponse::Forbidden()
-                .json(&serde_json::json!({"status": "fail", "message": message}));
+                .json(&json!({"status": "fail", "message": message}));
         }
     };
 
@@ -321,7 +323,7 @@ async fn logout_handler(
         Ok(token_details) => token_details,
         Err(e) => {
             return HttpResponse::Forbidden()
-                .json(&serde_json::json!({"status": "fail", "message": format_args!("{:?}", e)}));
+                .json(&json!({"status": "fail", "message": format_args!("{:?}", e)}));
         }
     };
 
@@ -335,7 +337,7 @@ async fn logout_handler(
 
     if redis_result.is_err() {
         return HttpResponse::UnprocessableEntity().json(
-            &serde_json::json!({"status": "error", "message": format_args!("{:?}", redis_result.unwrap_err())}),
+            &json!({"status": "error", "message": format_args!("{:?}", redis_result.unwrap_err())}),
         );
     }
 
@@ -361,7 +363,29 @@ async fn logout_handler(
         .cookie(access_cookie)
         .cookie(refresh_cookie)
         .cookie(logged_in_cookie)
-        .json(&serde_json::json!({"status": "success"}))
+        .json(&json!({"status": "success"}))
+}
+
+#[post("/users")]
+async fn users_handler(
+    req: web::Json<UsersRequest>,
+    auth_guard: auth::AuthorizationService,
+    state: AppState,
+) -> impl Responder {
+    let current_user = auth_guard.user;
+    if !current_user.is_admin {
+        HttpResponse::Forbidden().json(&json!({"status": "error", "message": "Users page is not available to normal user."}))
+    } else {
+        match state.get_ref().users(&req.sort_by, &req.last_record, req.ascending).await {
+            Ok((users, count)) => {
+                HttpResponse::Ok().json(&json!({"users": users, "count": count}))
+            },
+            Err(e) => {
+                info!("{:?}", e);
+                HttpResponse::InternalServerError().json(&json!({"status": "fail", "errors": "Internal Server Error"}))
+            }
+        }
+    }
 }
 
 pub fn init(cfg: &mut web::ServiceConfig) {

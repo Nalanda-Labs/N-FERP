@@ -1,7 +1,14 @@
 use crate::state::*;
 use crate::state::{redis::Client, KvPool, RedisConnectionManager};
+use nonblock_logger::info;
+use nonblock_logger::{
+    log::{LevelFilter, Record},
+    BaseFilter, BaseFormater, FixedLevel, JoinHandle, NonblockLogger,
+};
+use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 use std::sync::Arc;
+use std::time::Duration;
 
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
 pub struct Config {
@@ -20,12 +27,11 @@ pub struct Config {
     pub email_verification_expiry_time: u64,
     pub access_token_private_key: String,
     pub access_token_public_key: String,
-    pub access_token_expiry_time: String,
     pub access_token_max_age: i64,
     pub refresh_token_private_key: String,
     pub refresh_token_public_key: String,
-    pub refresh_token_expiry_time: String,
     pub refresh_token_max_age: i64,
+    pub results_per_page: u8,
 }
 
 impl Config {
@@ -45,6 +51,7 @@ impl Config {
             RedisConnectionManager::new(Client::open(self.redis.clone()).expect("redis open"));
         let kv = KvPool::builder().build(kvm);
         kv.set_max_idle_conns(100).await;
+        kv.set_conn_max_lifetime(Some(Duration::from_secs(300))).await;
 
         Arc::new(State {
             config: self,
@@ -131,13 +138,6 @@ impl Opts {
         (handle, opt)
     }
 }
-
-use nonblock_logger::info;
-use nonblock_logger::{
-    log::{LevelFilter, Record},
-    BaseFilter, BaseFormater, FixedLevel, JoinHandle, NonblockLogger,
-};
-use serde::{Deserialize, Serialize};
 
 pub fn format(base: &BaseFormater, record: &Record) -> String {
     let level = FixedLevel::with_color(record.level(), base.color_get())

@@ -1,5 +1,4 @@
 import { error } from '@sveltejs/kit';
-import jwt_decode from "jwt-decode";
 
 // change this to point it to a different host
 const base = 'http://localhost:8000/api/v1';
