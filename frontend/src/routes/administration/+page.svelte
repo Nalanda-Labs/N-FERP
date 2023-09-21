@@ -1,5 +1,3 @@
-Aministration
-
 <script>
   let list = [
     {
@@ -15,15 +13,15 @@ Aministration
   ];
 </script>
 
-
 <main class="bg-gray-100 h-screen overflow-hidden relative">
-    <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-4 my-4">
+    <h1 class="ml-2 mt-2 bg-white text-4xl font-extrabold dark:text-white p-2">Administration</h1>
+    <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 my-4 ml-2">
         {#each list as content}
         <div>
-            <div class="shadow-lg px-4 py-6 w-full bg-white relative">
+            <div class="shadow-lg px-4 py-6 bg-white relative">
                 <!-- {#each list as content} -->
                 <p
-                    class="text-sm w-max text-gray-700 font-semibold border-b border-gray-200"
+                    class="text-lg w-max text-gray-700 font-semibold border-b border-gray-200"
                 >
                     {content.heading}
                 </p>

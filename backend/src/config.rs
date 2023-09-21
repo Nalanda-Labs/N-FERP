@@ -49,10 +49,11 @@ impl Config {
         let sql = pool_options.connect(&self.sql).await.expect("sql open");
         let kvm =
             RedisConnectionManager::new(Client::open(self.redis.clone()).expect("redis open"));
-        let kv = KvPool::builder().build(kvm);
-        kv.set_max_idle_conns(100).await;
-        kv.set_conn_max_lifetime(Some(Duration::from_secs(300))).await;
-
+        let kv = KvPool::builder()
+            .max_open(200)
+            .max_idle(100)
+            .max_idle_lifetime(Some(Duration::from_secs(300)))
+            .build(kvm);
         Arc::new(State {
             config: self,
             sql,
