@@ -1,12 +1,14 @@
-
-USERS
-
-<div class="mt-4">
-    <div class="relative mt-4">
-		<a href="/administration/user" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Add</a>
+<main class="bg-gray-100 h-screen overflow-hidden relative">
+	<h1 class="ml-2 mt-2 bg-white text-4xl font-extrabold dark:text-white p-2">Users</h1>
+	<div class="mt-4 mr-4 float-right">
+		<a
+			href="/administration/user"
+			class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+			>Add</a
+		>
 	</div>
-
-	<div class="py-8">
+	<div style="clear: both;" />
+	<div class="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1 bg-white my-4 ml-2">
 		<div class="max-w-full overflow-x-auto rounded-lg">
 			<table class="table-auto leading-normal text-black">
 				<thead>
@@ -28,7 +30,6 @@ USERS
 							class="font-extrabold border-b border-gray-200 px-5 py-3 text-justify text-sm uppercase"
 						>
 							User Name
-							
 						</th>
 						<th
 							scope="col"
@@ -52,19 +53,13 @@ USERS
 							scope="col"
 							class="font-extrabold border-b border-gray-200 px-5 py-3 text-justify text-sm uppercase"
 						>
-							Role
+							Department
 						</th>
 						<th
 							scope="col"
 							class="font-extrabold border-b border-gray-200 px-5 py-3 text-justify text-sm uppercase"
 						>
-							Department
-						</th>
-							<th
-							scope="col"
-							class="font-extrabold border-b border-gray-200 px-5 py-3 text-justify text-sm uppercase"
-						>
-							System Administrator
+							Administrator
 						</th>
 						<th
 							scope="col"
@@ -105,19 +100,16 @@ USERS
 								<span class="relative whitespace-nowrap text-justify">active</span>
 							</span>
 						</td>
-							<td class="border-b border-gray-200 p-5 text-sm">
+						<td class="border-b border-gray-200 p-5 text-sm">
 							<p class="whitespace-nowrap text-justify">12345678910</p>
 						</td>
-							<td class="border-b border-gray-200 p-5 text-sm">
+						<td class="border-b border-gray-200 p-5 text-sm">
 							<p class="whitespace-nowrap text-justify">shivdayal@gmail.com</p>
 						</td>
-							<td class="border-b border-gray-200 p-5 text-sm">
-							<p class="whitespace-nowrap text-justify">Admin</p>
-						</td>
-							<td class="border-b border-gray-200 p-5 text-sm">
+						<td class="border-b border-gray-200 p-5 text-sm">
 							<p class="whitespace-nowrap text-justify">Technology</p>
 						</td>
-							<td class="border-b border-gray-200 p-5 text-sm">
+						<td class="border-b border-gray-200 p-5 text-sm">
 							<p class="whitespace-nowrap text-justify">Yes</p>
 						</td>
 						<td class="border-b border-gray-200 p-5 text-sm">
@@ -164,29 +156,18 @@ USERS
 						<td class="border-b border-gray-200 p-5 text-sm">
 							<p class="whitespace-nowrap">pmondal095@gmail.com</p>
 						</td>
-							<td class="border-b border-gray-200 p-5 text-sm">
-							<p class="whitespace-nowrap">Developer</p>
-						</td>
-							<td class="border-b border-gray-200 p-5 text-sm">
+						<td class="border-b border-gray-200 p-5 text-sm">
 							<p class="whitespace-nowrap">Technology</p>
 						</td>
-							<td class="border-b border-gray-200 p-5 text-sm">
+						<td class="border-b border-gray-200 p-5 text-sm">
 							<p class="whitespace-nowrap">No</p>
 						</td>
 						<td class="border-b border-gray-200 p-5 text-sm">
 							<span class="text-indigo-600 hover:text-indigo-900"> Edit </span>
 						</td>
-	
-				</tbody>
+					</tr></tbody
+				>
 			</table>
 		</div>
 	</div>
-
-	</div>
-
-
-
-
-
-
-
+</main>
