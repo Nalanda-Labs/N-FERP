@@ -37,7 +37,7 @@
 
                     <div
                         class="flex items-center mb-2 pb-2 text-sm space-x-12 md:space-x-24 justify-between border-b border-gray-200">
-                        <a href="/#">
+                        <a href="/administration/roles">
                             <p>{content.content2}</p>
                         </a>
                     </div>
