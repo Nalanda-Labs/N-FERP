@@ -8,7 +8,7 @@
 	<title>Create Role</title>
 </svelte:head>
 
-<main class="bg-gray-100 h-screen overflow-hidden relative">
+<main class="bg-gray-100 overflow-hidden relative">
 	<h1 class="ml-4 mt-2 bg-white text-4xl font-extrabold dark:text-white p-2 my-6">CREATE</h1>
 
 	<div class="ml-4 mb-6">

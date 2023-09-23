@@ -15,7 +15,7 @@
 	<title>Roles</title>
 </svelte:head>
 
-<main class="bg-gray-100 h-screen overflow-hidden relative">
+<main class="bg-gray-100 overflow-hidden relative">
 	<h1 class="ml-2 mt-2 bg-white text-4xl font-extrabold dark:text-white p-2">ROLES</h1>
 	<div class="mt-4 mr-4 float-right">
 		<a
