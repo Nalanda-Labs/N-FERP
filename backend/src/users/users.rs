@@ -2,6 +2,7 @@ use argon2;
 use chrono::Utc;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
+use validator::Validate;
 
 fn passhash_verify(pass: &str, hash: &str) -> bool {
     argon2::verify_encoded(&hash, pass.as_bytes()).unwrap()
@@ -27,9 +28,11 @@ pub struct User {
     pub department: String,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Validate)]
 pub struct Login {
+    #[validate(email)]
     pub email: String,
+    #[validate(length(min = 16))]
     pub password: String,
 }
 
@@ -47,7 +50,43 @@ pub struct UsersRequest {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
 pub struct UsersResponse {
     pub users: Vec<User>,
     pub count: u64,
+}
+
+#[derive(Serialize, Deserialize, Debug, Validate)]
+#[serde(rename_all = "camelCase")]
+pub struct CreateUserRequest {
+    #[validate(email)]
+    pub email: String,
+    pub username: String,
+    #[validate(length(min = 16))]
+    pub password: String,
+    #[validate(length(min = 16))]
+    pub confirm_password: String,
+    #[validate(length(min = 2))]
+    pub first_name: String,
+    #[validate(length(min = 2))]
+    pub last_name: String,
+    pub is_admin: bool,
+    pub title: String,
+    pub department: String,
+    pub phone_home: String,
+    pub phone_mobile: String,
+    pub phone_work: String,
+    pub phone_other: String,
+    pub phone_fax: String,
+    pub status: String,
+    pub address_street: String,
+    pub address_city: String,
+    pub address_state: String,
+    pub address_country: String,
+    pub address_postalcode: String,
+    pub employee_status: String,
+    pub messanger_id: String,
+    pub messanger_type: String,
+    pub reports_to_id: Uuid,
+    pub factor_auth: bool,
 }

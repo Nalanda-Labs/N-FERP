@@ -1,5 +1,5 @@
-<main class="bg-gray-100 h-screen overflow-hidden relative">
-	<h1 class="ml-2 mt-2 bg-white text-4xl font-extrabold dark:text-white p-2">Users</h1>
+	<main class="bg-gray-100 overflow-hidden relative">
+	<h1 class="ml-2 mt-2 bg-white text-4xl font-extrabold dark:text-white p-2s">Users</h1>
 	<div class="mt-4 mr-4 float-right">
 		<a
 			href="/administration/user"

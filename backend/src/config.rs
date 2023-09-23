@@ -8,7 +8,6 @@ use nonblock_logger::{
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 use std::sync::Arc;
-use std::time::Duration;
 
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
 pub struct Config {
@@ -52,7 +51,6 @@ impl Config {
         let kv = KvPool::builder()
             .max_open(200)
             .max_idle(100)
-            .max_idle_lifetime(Some(Duration::from_secs(300)))
             .build(kvm);
         Arc::new(State {
             config: self,

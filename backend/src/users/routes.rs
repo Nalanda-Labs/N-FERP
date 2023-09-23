@@ -8,8 +8,8 @@ use cookie::time::Duration;
 use mobc_redis::redis::{self, AsyncCommands};
 use nonblock_logger::{debug, info};
 use serde::{Deserialize, Serialize};
-use uuid::Uuid;
 use serde_json::json;
+use uuid::Uuid;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct LoginResponse {
@@ -34,9 +34,8 @@ async fn login(form: web::Json<Login>, state: AppState) -> impl Responder {
                 ) {
                     Ok(token_details) => token_details,
                     Err(e) => {
-                        return HttpResponse::BadGateway().json(
-                            &json!({"status": "fail", "message": format_args!("{}", e)}),
-                        );
+                        return HttpResponse::BadGateway()
+                            .json(&json!({"status": "fail", "message": format_args!("{}", e)}));
                     }
                 };
 
@@ -47,18 +46,16 @@ async fn login(form: web::Json<Login>, state: AppState) -> impl Responder {
                 ) {
                     Ok(token_details) => token_details,
                     Err(e) => {
-                        return HttpResponse::BadGateway().json(
-                            &json!({"status": "fail", "message": format_args!("{}", e)}),
-                        );
+                        return HttpResponse::BadGateway()
+                            .json(&json!({"status": "fail", "message": format_args!("{}", e)}));
                     }
                 };
 
                 let mut redis_client = match state.kv.get().await {
                     Ok(redis_client) => redis_client,
                     Err(e) => {
-                        return HttpResponse::InternalServerError().json(
-                            &json!({"status": "fail", "message": format_args!("{}", e)}),
-                        );
+                        return HttpResponse::InternalServerError()
+                            .json(&json!({"status": "fail", "message": format_args!("{}", e)}));
                     }
                 };
 
@@ -71,9 +68,8 @@ async fn login(form: web::Json<Login>, state: AppState) -> impl Responder {
                     .await;
 
                 if let Err(e) = access_result {
-                    return HttpResponse::UnprocessableEntity().json(
-                        &json!({"status": "error", "message": format_args!("{}", e)}),
-                    );
+                    return HttpResponse::UnprocessableEntity()
+                        .json(&json!({"status": "error", "message": format_args!("{}", e)}));
                 }
 
                 let refresh_result: redis::RedisResult<()> = redis_client
@@ -85,9 +81,8 @@ async fn login(form: web::Json<Login>, state: AppState) -> impl Responder {
                     .await;
 
                 if let Err(e) = refresh_result {
-                    return HttpResponse::UnprocessableEntity().json(
-                        &json!({"status": "error", "message": format_args!("{}", e)}),
-                    );
+                    return HttpResponse::UnprocessableEntity()
+                        .json(&json!({"status": "error", "message": format_args!("{}", e)}));
                 }
 
                 drop(redis_client);
@@ -150,8 +145,7 @@ async fn refresh_access_token_handler(req: HttpRequest, state: AppState) -> impl
         Some(c) => c.value().to_string(),
         None => {
             info!("step 1");
-            return HttpResponse::Forbidden()
-                .json(&json!({"status": "fail", "message": message}));
+            return HttpResponse::Forbidden().json(&json!({"status": "fail", "message": message}));
         }
     };
 
@@ -191,13 +185,15 @@ async fn refresh_access_token_handler(req: HttpRequest, state: AppState) -> impl
     };
 
     let user_id_uuid = Uuid::parse_str(&user_id).unwrap();
-    let query_result = sqlx::query_as!(User, 
+    let query_result = sqlx::query_as!(
+        User,
         "SELECT id, first_name, last_name, username, email, password_hash, created_date,
         modified_date, is_admin, status, department FROM users WHERE id = $1",
-        user_id_uuid)
-        .fetch_optional(&state.sql)
-        .await
-        .unwrap();
+        user_id_uuid
+    )
+    .fetch_optional(&state.sql)
+    .await
+    .unwrap();
 
     if query_result.is_none() {
         return HttpResponse::Forbidden()
@@ -243,7 +239,7 @@ async fn refresh_access_token_handler(req: HttpRequest, state: AppState) -> impl
             &json!({"status": "error", "message": format_args!("{:?}", redis_result.unwrap_err())}),
         );
     }
-    
+
     let redis_result: redis::RedisResult<()> = redis_client
         .set_ex(
             access_token_details.token_uuid.to_string(),
@@ -311,8 +307,7 @@ async fn logout_handler(
     let refresh_token = match req.cookie("refresh_token") {
         Some(c) => c.value().to_string(),
         None => {
-            return HttpResponse::Forbidden()
-                .json(&json!({"status": "fail", "message": message}));
+            return HttpResponse::Forbidden().json(&json!({"status": "fail", "message": message}));
         }
     };
 
@@ -374,15 +369,47 @@ async fn users_handler(
 ) -> impl Responder {
     let current_user = auth_guard.user;
     if !current_user.is_admin {
-        HttpResponse::Forbidden().json(&json!({"status": "error", "message": "Users page is not available to normal user."}))
+        HttpResponse::Forbidden().json(
+            &json!({"status": "error", "message": "Users page is not available to normal user."}),
+        )
     } else {
-        match state.get_ref().users(&req.sort_by, &req.last_record, req.ascending).await {
-            Ok((users, count)) => {
-                HttpResponse::Ok().json(&json!({"users": users, "count": count}))
-            },
+        match state
+            .get_ref()
+            .users(&req.sort_by, &req.last_record, req.ascending)
+            .await
+        {
+            Ok((users, count)) => HttpResponse::Ok().json(&json!({"users": users, "count": count})),
             Err(e) => {
                 info!("{:?}", e);
-                HttpResponse::InternalServerError().json(&json!({"status": "fail", "errors": "Internal Server Error"}))
+                HttpResponse::InternalServerError()
+                    .json(&json!({"status": "fail", "errors": "Internal Server Error"}))
+            }
+        }
+    }
+}
+
+#[post("/user/create")]
+async fn create_user_handler(
+    req: web::Json<CreateUserRequest>,
+    auth_guard: auth::AuthorizationService,
+    state: AppState,
+) -> impl Responder {
+    let current_user = auth_guard.user;
+    if !current_user.is_admin {
+        HttpResponse::Forbidden().json(
+            &json!({"status": "error", "message": "create user is not available to normal user."}),
+        )
+    } else {
+        match state
+            .get_ref()
+            .create_user(&req)
+            .await
+        {
+            Ok((id)) => HttpResponse::Ok().json(&json!({"status": "success", "id": id})),
+            Err(e) => {
+                info!("{:?}", e);
+                HttpResponse::InternalServerError()
+                    .json(&json!({"status": "fail", "errors": "Internal Server Error"}))
             }
         }
     }

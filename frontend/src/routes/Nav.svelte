@@ -7,7 +7,7 @@
 <nav class="bg-white border-gray-200 dark:bg-gray-900 border-b-2">
 	<div class="max-w-full-xl flex flex-wrap items-center justify-between mx-auto p-4">
 		<a href="/" class="flex items-center">
-			<!-- <img src="/logo.svg" class="h-8 mr-3" alt="FERP Logo" /> -->
+			<img src="/logo.png" class="h-8 mr-3" alt="FERP Logo" />
 			<span class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">FERP</span>
 		</a>
 		<div class="hidden w-full md:block md:w-auto" id="navbar-default">
