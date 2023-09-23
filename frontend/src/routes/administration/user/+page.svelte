@@ -1,18 +1,18 @@
 <script>
 	import { Input, Label, Button, Select, Radio, Toggle, Checkbox } from 'flowbite-svelte';
 	import { enhance } from '$app/forms';
-	let selected = '';
+	let selected = 'regular';
 	let roles = [
 		{ value: 'admin', name: 'Administrator' },
 		{ value: 'regular', name: 'Normal User' }
 	];
-	let selected_status = '';
+	let selected_status = 'active';
 	let statuses = [
 		{ value: 'active', name: 'Active' },
 		{ value: 'terminated', name: 'Terminated' },
 		{ value: 'onLeave', name: 'On Leave' }
 	];
-	let selected_messanger = '';
+	let selected_messanger;
 	let messangers = [
 		{ value: 'whatsapp', name: 'Whatsapp' },
 		{ value: 'telegram', name: 'Telegram' }
@@ -27,11 +27,11 @@
 			<div class="grid gap-6 mb-6 md:grid-cols-4 gap-6 mt-10 p-2">
 				<div>
 					<Label for="firstName" class="mb-2">First name*</Label>
-					<Input name="firstName" type="text" id="firstName" placeholder="John" required />
+					<Input name="firstName" type="text" id="firstName" minlength="2" placeholder="John" required />
 				</div>
 				<div>
 					<Label for="lastName" class="mb-2">Last name*</Label>
-					<Input name="lastName" type="text" id="lastName" placeholder="Doe" required />
+					<Input name="lastName" type="text" id="lastName" minlength="2" placeholder="Doe" required />
 				</div>
 				<div class="mb-6">
 					<Label for="title" class="mb-2">Job Title</Label>
