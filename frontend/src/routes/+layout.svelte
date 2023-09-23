@@ -4,6 +4,7 @@
 	import PreloadingIndicator from './PreloadingIndicator.svelte';
 	import Sidebar from './Sidebar.svelte';
 	import { page } from '$app/stores';
+	import Footer from './Footer.svelte';
 	import '../app.css';
 </script>
 
@@ -18,3 +19,4 @@
 <main>
 	<slot />
 </main>
+<Footer />

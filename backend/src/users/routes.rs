@@ -326,7 +326,7 @@ async fn logout_handler(
     let redis_result: redis::RedisResult<usize> = redis_client
         .del(&[
             refresh_token_details.token_uuid.to_string(),
-            auth_guard.xsrf_token.to_string(),
+            auth_guard.xsrf_token,
         ])
         .await;
 
