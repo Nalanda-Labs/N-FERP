@@ -1,7 +1,6 @@
 <script>
 	import { page } from '$app/stores';
-	import { Button, Dropdown, DropdownItem } from 'flowbite-svelte';
-	import { ChevronDownSolid } from 'flowbite-svelte-icons';
+	import { A } from 'flowbite-svelte';
 </script>
 
 <nav class="bg-white border-gray-200 dark:bg-gray-900 border-b-2">
@@ -16,10 +15,10 @@
 			>
 				{#if $page.data.user}
 					<li>
-						<a
+						<A
 							href="/user/{$page.data.user.username}"
-							class="block py-2 pl-3 pr-4 text-white bg-blue-700 rounded md:bg-transparent md:text-blue-700 md:p-0 dark:text-white md:dark:text-blue-500"
-							aria-current="page">{$page.data.user.username}</a
+							class="block py-2 pl-3 pr-4 rounded md:bg-transparent"
+							aria-current="page">{$page.data.user.username}</A
 						>
 					</li>
 				{/if}

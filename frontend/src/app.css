@@ -2,11 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
-a {
+/* a {
     color: #3681F3;
-}
+} */
 
-button {
+/* button {
     color: #fff;
     background-color: #3681F3!important;
+} */
+
+body {
+    font-family: "Roboto";
 }

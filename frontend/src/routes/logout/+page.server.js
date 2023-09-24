@@ -8,7 +8,8 @@ export function load() {
 /** @type {import('./$types.js').Actions} */
 export const actions = {
 	default: async ({ cookies, locals, request }) => {
-		const resp = await api.post('auth/logout', {}, locals.accessToken?.tokenUuid, request.headers)
+		let xsrf_token = cookies.get('xsrf_token');
+		const resp = await api.post('auth/logout', {}, xsrf_token, request.headers)
 
 		let text = await resp.text();
 		let j = text ? JSON.parse(text) : {};
@@ -18,7 +19,6 @@ export const actions = {
 		}
 
 		for (const pair of request.headers.entries()) {
-			console.log(pair);
 			if (pair[0] === 'cookie') {
 				let split_cookie = pair[1].split(';');
 				split_cookie.forEach((c) => {
@@ -31,7 +31,6 @@ export const actions = {
 		}
 
 		locals.user = null;
-		locals.accessToken = null;
 
 		throw redirect(307, '/');
 	}

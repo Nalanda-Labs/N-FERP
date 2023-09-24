@@ -8,8 +8,8 @@ export async function load({ locals }) {
 export const actions = {
 	// @ts-ignore
 	create: async ({ request }) => {
-		const formData = await request.formData();
-		console.log(formData.get('role'));
+		const data = await request.formData();
+		console.log(data.get('role'));
 		return {
 			success: true
 		};

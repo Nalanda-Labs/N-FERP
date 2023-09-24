@@ -8,7 +8,7 @@
 	}
 
 	/** @type {import('./$types').ActionData} */
-	export let form;
+	export let data;
 </script>
 
 <svelte:head>
