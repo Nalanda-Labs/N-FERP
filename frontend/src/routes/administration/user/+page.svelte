@@ -1,5 +1,4 @@
 <script>
-	import { page } from '$app/stores';
 	import { Input, Label, Button, Select, Toggle, Search, Alert } from 'flowbite-svelte';
 	import { InfoCircleSolid } from 'flowbite-svelte-icons';
 	import * as api from '../../../lib/api.js';
@@ -27,6 +26,7 @@
 
 		if (email && email.includes('@')) {
 			try {
+				// TODO: considering moving this xsrf_token code to a common place
 				let xsrf_token = document.cookie.split('=')[1];
 				let resp = await api.post('email-exists', { email }, xsrf_token);
 				let data = JSON.parse(await resp.text());
@@ -46,12 +46,14 @@
 		const username = document.getElementById('username')?.value;
 
 		try {
-			let resp = await api.post('/username-exists', { username });
+			// TODO: considering moving this xsrf_token code to a common places
+			let xsrf_token = document.cookie.split('=')[1];
+			let resp = await api.post('username-exists', { username }, xsrf_token);
 			let data = JSON.parse(await resp.text());
-			if (data.status && data.status === false) {
-				emailExists = 'This username already exists.';
+			if (data.status && data.status === 'success') {
+				usernameExists = 'This username already exists.';
 			} else {
-				emailExists = '';
+				usernameExists = '';
 			}
 		} catch (e) {
 			error = 'An error occurred. Please contact support.';
@@ -118,12 +120,12 @@
 					<Input
 						name="username"
 						type="text"
-						id="user"
+						id="username"
 						placeholder="john231"
 						on:input={checkUsername}
 						required
 					/>
-					<span class="red">{usernameExists}</span>
+					<span class="red text-xs text-red-700">{usernameExists}</span>
 				</div>
 				<div class="mb-6">
 					<Label for="password" class="mb-2 text-red-500">Password*</Label>

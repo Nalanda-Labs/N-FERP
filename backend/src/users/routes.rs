@@ -450,9 +450,27 @@ async fn email_exists(
     }
 }
 
+#[post("/username-exists")]
+async fn username_exists(
+    req: web::Json<UsernameExistsRequest>,
+    _auth_guard: auth::AuthorizationService,
+    state: AppState,
+) -> impl Responder {
+    match state.get_ref().username_exists(&req.username).await {
+        Ok(true) => HttpResponse::Ok().json(&json!({"status": "success"})),
+        Ok(false) => HttpResponse::Ok().json(&json!({"status": "fail"})),
+        Err(e) => {
+            info!("{:?}", e);
+            HttpResponse::InternalServerError()
+                .json(&json!({"status": "fail", "error": e.to_string()}))
+        }
+    }
+}
+
 pub fn init(cfg: &mut web::ServiceConfig) {
     cfg.service(login);
     cfg.service(refresh_access_token_handler);
     cfg.service(logout_handler);
     cfg.service(email_exists);
+    cfg.service(username_exists);
 }
