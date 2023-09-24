@@ -3632,7 +3632,9 @@ create table users (
   reports_to_id uuid default null,
   is_group boolean default null,
   factor_auth boolean default false,
-  factor_auth_interface varchar(255) default ''
+  factor_auth_interface varchar(255) default '',
+  whatsapp varchar(32) default '',
+  telegram varchar(32) default ''
 );
 
 create unique index users_username on users(username);

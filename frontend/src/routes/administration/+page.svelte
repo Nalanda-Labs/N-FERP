@@ -1,4 +1,5 @@
 <script>
+	import {A} from 'flowbite-svelte';
 	let list = [
 		{
 			heading: 'Users And Authentication',
@@ -30,56 +31,56 @@
 							<div
 								class="flex items-center pb-2 mb-2 text-sm sm:space-x-12 justify-between border-b border-gray-200"
 							>
-								<a href="/administration/users">
+								<A href="/administration/users">
 									<p>{content.content1}</p>
-								</a>
+								</A>
 							</div>
 
 							<div
 								class="flex items-center mb-2 pb-2 text-sm space-x-12 md:space-x-24 justify-between border-b border-gray-200"
 							>
-								<a href="/administration/roles">
+								<A href="/administration/roles">
 									<p>{content.content2}</p>
-								</a>
+								</A>
 							</div>
 							<div
 								class="lex items-center mb-2 pb-2 text-sm space-x-12 md:space-x-24 justify-between border-b border-gray-200"
 							>
-								<a href="/#">
+								<A href="/#">
 									<p>{content.content3}</p>
-								</a>
+								</A>
 							</div>
 
 							<div
 								class="lex items-center mb-2 pb-2 text-sm space-x-12 md:space-x-24 justify-between border-b border-gray-200"
 							>
-								<a href="/#">
+								<A href="/#">
 									<p>{content.content4}</p>
-								</a>
+								</A>
 							</div>
 
 							<div
 								class="lex items-center mb-2 pb-2 text-sm space-x-12 md:space-x-24 justify-between border-b border-gray-200"
 							>
-								<a href="/#">
+								<A href="/#">
 									<p>{content.content5}</p>
-								</a>
+								</A>
 							</div>
 
 							<div
 								class="lex items-center mb-2 pb-2 text-sm space-x-12 md:space-x-24 justify-between border-b border-gray-200"
 							>
-								<a href="/#">
+								<A href="/#">
 									<p>{content.content6}</p>
-								</a>
+								</A>
 							</div>
 
 							<div
 								class="lex items-center mb-2 pb-2 text-sm space-x-12 md:space-x-24 justify-between border-b border-gray-200"
 							>
-								<a href="/#">
+								<A href="/#">
 									<p>{content.content7}</p>
-								</a>
+								</A>
 							</div>
 						</div>
 					</div>

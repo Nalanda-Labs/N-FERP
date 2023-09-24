@@ -17,9 +17,10 @@
 			if (resp.status === 403) {
 				goto('/');
 			}
+			
 			// TODO: remove this hardcoding. keep this interval less than access token max age
 		}
-	}, 10 * 60 *1000);
+	}, 10 * 60 * 1000);
 
 	onMount(async () => {
 		// this immediate refresh is for the reason when user will close the
@@ -39,10 +40,10 @@
 	})
 </script>
 
-<Sidebar {activeUrl} class="float-left h-screen">
+<Sidebar {activeUrl} class="float-left h-full">
 	<SidebarWrapper>
 		<SidebarGroup>
-			<SidebarItem label="Dashboard" active={activeUrl === '/dashboard'} href="/dashboard" />
+			<SidebarItem label="Dashboard" active={activeUrl === '/dashboard'} href="/dashboard" {spanClass} />
 			{#if $page.data.user && $page.data.user.isAdmin}
 				<SidebarItem label="Adminstration" href="/administration" />
 			{/if}

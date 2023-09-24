@@ -1,13 +1,13 @@
+<script>
+	import { Button } from 'flowbite-svelte';
+</script>
+
 <main class="bg-gray-100 overflow-hidden relative">
 	<div class="bg-white m-2">
 		<h1 class="ml-2 mt-2 bg-white text-4xl font-extrabold dark:text-white p-2">Users</h1>
 		<hr />
 		<div class="mt-4 mr-4 float-right">
-			<a
-				href="/administration/user"
-				class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
-				>Add</a
-			>
+			<Button href="/administration/user">Add</Button>
 		</div>
 		<div style="clear: both;" />
 		<div class="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1 bg-white my-4 ml-2">

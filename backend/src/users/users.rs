@@ -87,6 +87,12 @@ pub struct CreateUserRequest {
     pub employee_status: String,
     pub messanger_id: String,
     pub messanger_type: String,
-    pub reports_to_id: Uuid,
+    pub reports_to_id: String,
     pub factor_auth: bool,
+}
+
+#[derive(Serialize, Deserialize, Debug, Validate)]
+pub struct EmailExistsRequest {
+    #[validate(email)]
+    pub email: String,
 }

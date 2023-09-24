@@ -54,7 +54,11 @@ export const actions = {
 					}
 				});
 
-				cookies.set(cookie_name, cookie_value, { httpOnly: httpOnly, domain: domain, maxAge: maxAge, path: path, secure: secure, sameSite: 'lax' });
+				if(cookie_name !== 'xsrf_token') {
+					cookies.set(cookie_name, cookie_value, { httpOnly: httpOnly, domain: domain, maxAge: maxAge, path: path, secure: secure, sameSite: 'lax' });
+				} else {
+					cookies.set(cookie_name, cookie_value, { httpOnly: false, domain: domain, maxAge: maxAge, path: path, secure: secure, sameSite: 'lax' });
+				}
 			}
 		}
 

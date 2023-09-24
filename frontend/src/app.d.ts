@@ -10,12 +10,6 @@ declare global {
 				firstName: String,
 				lastName: String,
 				isAdmin: Boolean
-			} | null,
-			accessToken: {
-				token: String,
-				tokenUuid: String,
-				userId: String,
-				expiresIn: int
 			} | null
 		}
 		interface PageData {

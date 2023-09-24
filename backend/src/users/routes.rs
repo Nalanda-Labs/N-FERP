@@ -103,6 +103,14 @@ async fn login(form: web::Json<Login>, state: AppState) -> impl Responder {
                         .max_age(Duration::new(state.config.refresh_token_max_age * 60, 0))
                         .http_only(true)
                         .finish();
+                let xsrf_cookie =
+                    Cookie::build("xsrf_token", access_token_details.token_uuid.to_string())
+                        .domain(&state.config.host)
+                        .path("/")
+                        .secure(true)
+                        .max_age(Duration::new(state.config.access_token_max_age * 60, 0))
+                        .http_only(false)
+                        .finish();
 
                 let r: LoginResponse = LoginResponse {
                     user,
@@ -112,6 +120,7 @@ async fn login(form: web::Json<Login>, state: AppState) -> impl Responder {
                     Ok(json) => HttpResponse::Ok()
                         .cookie(access_cookie)
                         .cookie(refresh_cookie)
+                        .cookie(xsrf_cookie)
                         .cookie(
                             Cookie::build("logged_in", json)
                                 .domain(&state.config.host)
@@ -272,6 +281,14 @@ async fn refresh_access_token_handler(req: HttpRequest, state: AppState) -> impl
         .http_only(true)
         .finish();
 
+    let xsrf_cookie = Cookie::build("xsrf_token", access_token_details.token_uuid.to_string())
+        .domain(&state.config.host)
+        .path("/")
+        .secure(true)
+        .max_age(Duration::new(state.config.access_token_max_age * 60, 0))
+        .http_only(false)
+        .finish();
+
     let r: LoginResponse = LoginResponse {
         user,
         success: true,
@@ -280,6 +297,7 @@ async fn refresh_access_token_handler(req: HttpRequest, state: AppState) -> impl
         Ok(json) => HttpResponse::Ok()
             .cookie(access_cookie)
             .cookie(refresh_cookie)
+            .cookie(xsrf_cookie)
             .cookie(
                 Cookie::build("logged_in", json)
                     .domain(&state.config.host)
@@ -388,29 +406,46 @@ async fn users_handler(
     }
 }
 
-#[post("/user/create")]
-async fn create_user_handler(
-    req: web::Json<CreateUserRequest>,
-    auth_guard: auth::AuthorizationService,
+// #[post("/user/create")]
+// async fn create_user_handler(
+//     req: web::Json<CreateUserRequest>,
+//     auth_guard: auth::AuthorizationService,
+//     state: AppState,
+// ) -> impl Responder {
+//     let current_user = auth_guard.user;
+//     if !current_user.is_admin {
+//         HttpResponse::Forbidden().json(
+//             &json!({"status": "error", "message": "create user is not available to normal user."}),
+//         )
+//     } else {
+//         match state
+//             .get_ref()
+//             .create_user(&req)
+//             .await
+//         {
+//             Ok((id)) => HttpResponse::Ok().json(&json!({"status": "success", "id": id})),
+//             Err(e) => {
+//                 info!("{:?}", e);
+//                 HttpResponse::InternalServerError()
+//                     .json(&json!({"status": "fail", "errors": "Internal Server Error"}))
+//             }
+//         }
+//     }
+// }
+
+#[post("/email-exists")]
+async fn email_exists(
+    req: web::Json<EmailExistsRequest>,
+    _auth_guard: auth::AuthorizationService,
     state: AppState,
 ) -> impl Responder {
-    let current_user = auth_guard.user;
-    if !current_user.is_admin {
-        HttpResponse::Forbidden().json(
-            &json!({"status": "error", "message": "create user is not available to normal user."}),
-        )
-    } else {
-        match state
-            .get_ref()
-            .create_user(&req)
-            .await
-        {
-            Ok((id)) => HttpResponse::Ok().json(&json!({"status": "success", "id": id})),
-            Err(e) => {
-                info!("{:?}", e);
-                HttpResponse::InternalServerError()
-                    .json(&json!({"status": "fail", "errors": "Internal Server Error"}))
-            }
+    match state.get_ref().email_exists(&req.email).await {
+        Ok(true) => HttpResponse::Ok().json(&json!({"status": "success"})),
+        Ok(false) => HttpResponse::Ok().json(&json!({"status": "fail"})),
+        Err(e) => {
+            info!("{:?}", e);
+            HttpResponse::InternalServerError()
+                .json(&json!({"status": "fail", "error": e.to_string()}))
         }
     }
 }
@@ -419,4 +454,5 @@ pub fn init(cfg: &mut web::ServiceConfig) {
     cfg.service(login);
     cfg.service(refresh_access_token_handler);
     cfg.service(logout_handler);
+    cfg.service(email_exists);
 }
