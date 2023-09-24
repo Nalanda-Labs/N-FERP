@@ -15,6 +15,7 @@ pub trait IUser: std::ops::Deref<Target = AppStateRaw> {
         ascending: bool,
     ) -> sqlx::Result<(Vec<User>, u64)>;
     async fn email_exists(&self, email: &str) ->sqlx::Result<bool>;
+    async fn username_exists(&self, username: &str) ->sqlx::Result<bool>;
 }
 
 #[cfg(any(feature = "postgres"))]
@@ -117,6 +118,26 @@ impl IUser for &AppStateRaw {
         };
 
         if email != "" {
+            Ok(true)
+        } else {
+            Ok(false)
+        }
+    }
+
+    async fn username_exists(&self, username: &str) ->sqlx::Result<bool> {
+        let row = sqlx::query!(
+            r#"
+            SELECT username from users where username=$1
+            "#,
+            username
+        ).fetch_optional(&self.sql).await?;
+
+        let username = match row {
+            Some(s) => s.username,
+            None => "".to_owned()
+        };
+
+        if username != "" {
             Ok(true)
         } else {
             Ok(false)

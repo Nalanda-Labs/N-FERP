@@ -96,3 +96,9 @@ pub struct EmailExistsRequest {
     #[validate(email)]
     pub email: String,
 }
+
+#[derive(Serialize, Deserialize, Debug, Validate)]
+pub struct UsernameExistsRequest {
+    pub username: String,
+}
+
