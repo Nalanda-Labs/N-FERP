@@ -12,15 +12,15 @@ export const actions = {
 		let data = await request.formData();
 		let isAdmin = data.get('isAdmin');
 
-		if(isAdmin === null) {
+		if (isAdmin === null) {
 			isAdmin = false;
 		} else {
 			isAdmin = true;
 		}
 
-		let factorAuth = data.get('factorAuth'); 
+		let factorAuth = data.get('factorAuth');
 
-		if(factorAuth === null) {
+		if (factorAuth === null) {
 			factorAuth = false;
 		} else {
 			factorAuth = true;
@@ -65,6 +65,6 @@ export const actions = {
 			throw error(resp.status, j.message);
 		}
 
-		throw redirect(307, `/user/${j.id}`);
+		throw redirect(307, `/administration/user/${j.id}`);
 	}
 };

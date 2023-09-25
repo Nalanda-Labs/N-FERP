@@ -16,9 +16,9 @@
 	export let data;
 </script>
 
+{#if $page.data.user?.isAdmin}
 <main class="bg-gray-100 overflow-hidden relative">
 	<div class="bg-white m-2">
-		{#if $page.data.user.isAdmin}
 		<h1 class="ml-2 mt-2 bg-white text-4xl font-extrabold dark:text-white p-2">Users</h1>
 		<hr />
 		<div class="mt-4 mr-4 float-right">
@@ -41,7 +41,7 @@
 							<span class="sr-only">Edit</span>
 						</TableHeadCell>
 					</TableHead>
-					<TableBody class="divide-y">
+					<TableBody>
 						{#each data.users as user}
 						<TableBodyRow>
 							<TableBodyCell>{user.firstName||''}</TableBodyCell>
@@ -58,19 +58,20 @@
 								<Checkbox disabled></Checkbox>
 								{/if}
 							</TableBodyCell>
-							<TableBodyCell><A href="/user/edit/{user.id}">Edit</A></TableBodyCell>
+							<TableBodyCell><A href="/administration/user/edit/{user.id}">Edit</A></TableBodyCell>
 						</TableBodyRow>
 						{/each}
 					</TableBody>
 				</Table>
 			</div>
 		</div>
-		{:else}
-		<h1 class="only-admin">Only admins are allowed to view this!</h1>
-		{/if}
 	</div>
 </main>
-
+{:else}
+<div>
+<h1 class="only-admin">Only admins are allowed to view this!</h1>
+</div>
+{/if}
 <style>
 	.only-admin {
 		font-size: 4em;

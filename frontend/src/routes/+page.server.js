@@ -1,4 +1,4 @@
-import { fail, redirect } from '@sveltejs/kit';
+import { redirect } from '@sveltejs/kit';
 import * as api from '../lib/api.js';
 
 /** @type {import('./$types').PageServerLoad} */
