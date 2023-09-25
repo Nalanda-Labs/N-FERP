@@ -18,8 +18,9 @@ export const actions = {
 
 		let text = await resp.text();
 		let j = text ? JSON.parse(text) : {};
-		if (j.errors) {
-			return fail(401, j);
+
+		if (j.message) {
+			return { success: false, message: j.message, email:data.get('email'), password: data.get('password') };
 		}
 
 		for (const pair of resp.headers.entries()) {
@@ -54,7 +55,7 @@ export const actions = {
 					}
 				});
 
-				if(cookie_name !== 'xsrf_token') {
+				if (cookie_name !== 'xsrf_token') {
 					cookies.set(cookie_name, cookie_value, { httpOnly: httpOnly, domain: domain, maxAge: maxAge, path: path, secure: secure, sameSite: 'lax' });
 				} else {
 					cookies.set(cookie_name, cookie_value, { httpOnly: false, domain: domain, maxAge: maxAge, path: path, secure: secure, sameSite: 'lax' });

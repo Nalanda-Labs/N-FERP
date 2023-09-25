@@ -27,13 +27,14 @@ async function send({ method, path, data, xsrf_token, headers }) {
 	// this is needed so that cookies are set when request originate from browser
 	opts.credentials = 'include';
 
-	const res = await fetch(`${base}/${path}`, opts);
+	return fetch(`${base}/${path}`, opts);
 
-	if (res.ok || res.status === 422) {
-		return res;
-	}
+	// if (res.ok || res.status === 422) {
+	// return res;
+	// }
 
-	throw error(res.status);
+	// let j = JSON.parse(await res.text());
+	// throw error(res.status, {message: j.errors});
 }
 
 export function get(path, xsrf_token, headers) {

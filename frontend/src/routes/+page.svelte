@@ -2,13 +2,15 @@
 	import { enhance } from '$app/forms';
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
+	import {Alert} from 'flowbite-svelte';
+	import { InfoCircleSolid } from 'flowbite-svelte-icons';
 
 	if ($page.data.user) {
 		goto('/dashboard');
 	}
 
 	/** @type {import('./$types').ActionData} */
-	export let data;
+	export let form;
 </script>
 
 <svelte:head>
@@ -43,6 +45,7 @@
 									maxlength="255"
 									class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
 									placeholder="name@company.com"
+									value={form?.email||''}
 									required
 								/>
 							</div>
@@ -61,8 +64,12 @@
 									maxlength="64"
 									class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
 									required
+									value={form?.password||''}
 								/>
 							</div>
+							{#if form?.success == false}
+							<span class="text-red-500 text-xs">Username or password is wrong!</span>
+							{/if}
 							<div class="flex items-center justify-between">
 								<a
 									href="/forgot-password"

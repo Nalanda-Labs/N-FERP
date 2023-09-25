@@ -1,5 +1,7 @@
 <script>
+	import { page } from '$app/stores';
 	import {A} from 'flowbite-svelte';
+
 	let list = [
 		{
 			heading: 'Users And Authentication',
@@ -16,6 +18,7 @@
 
 <main class="bg-gray-100 overflow-hidden relative m-2">
 	<div class="bg-white m-2">
+		{#if $page.data.user.isAdmin }
 		<h1 class="ml-2 mt-2 bg-white text-4xl font-extrabold dark:text-white p-2">Administration</h1>
 		<hr />
 		<div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 my-4 ml-2">
@@ -87,5 +90,16 @@
 				</div>
 			{/each}
 		</div>
+		{:else}
+		<h1 class="only-admin">Only admins are allowed to view this!</h1>
+		{/if}
 	</div>
 </main>
+
+<style>
+	.only-admin {
+		font-size: 4em;
+		margin: 4em 0;
+		text-align: center;
+	}
+</style>

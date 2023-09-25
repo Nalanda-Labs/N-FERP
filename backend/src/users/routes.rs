@@ -136,7 +136,7 @@ async fn login(form: web::Json<Login>, state: AppState) -> impl Responder {
                 };
                 resp
             } else {
-                HttpResponse::Unauthorized().finish()
+                HttpResponse::Unauthorized().json(&json!({"message": "Username or password is wrong!"}))
             }
         }
         Err(e) => {
@@ -388,7 +388,7 @@ async fn users_handler(
     let current_user = auth_guard.user;
     if !current_user.is_admin {
         HttpResponse::Forbidden().json(
-            &json!({"status": "error", "message": "Users page is not available to normal user."}),
+            &json!({"status": "error", "errors": "Users page is not available to normal user."}),
         )
     } else {
         match state
@@ -476,4 +476,5 @@ pub fn init(cfg: &mut web::ServiceConfig) {
     cfg.service(email_exists);
     cfg.service(username_exists);
     cfg.service(create_user_handler);
+    cfg.service(users_handler);
 }
