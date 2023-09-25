@@ -1,8 +1,10 @@
-use argon2;
+use argon2::{self, Config};
 use chrono::Utc;
+use rand::Rng;
+use ring::digest;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
-use validator::Validate;
+use validator::{Validate, ValidationError};
 
 fn passhash_verify(pass: &str, hash: &str) -> bool {
     argon2::verify_encoded(&hash, pass.as_bytes()).unwrap()
@@ -56,6 +58,27 @@ pub struct UsersResponse {
     pub count: u64,
 }
 
+fn validate_status(status: &str) -> Result<(), ValidationError> {
+    if status != "active" || status != "terminated" || status != "onLeave" {
+        // the value of the username will automatically be added later
+        return Err(ValidationError::new("Bad status!"));
+    }
+
+    Ok(())
+}
+
+// TODO: move into utils
+pub fn passhash(pass: &str) -> String {
+    let config = Config::default();
+    const CREDENTIAL_LEN: usize = digest::SHA512_OUTPUT_LEN;
+
+    let mut salt = [0_u8; CREDENTIAL_LEN];
+    rand::thread_rng().fill(&mut salt);
+    let hash = argon2::hash_encoded(pass.as_bytes(), &salt, &config).unwrap();
+
+    hash
+}
+
 #[derive(Serialize, Deserialize, Debug, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct CreateUserRequest {
@@ -78,6 +101,7 @@ pub struct CreateUserRequest {
     pub phone_work: String,
     pub phone_other: String,
     pub phone_fax: String,
+    #[validate(custom = "validate_status")]
     pub status: String,
     pub address_street: String,
     pub address_city: String,
@@ -85,10 +109,12 @@ pub struct CreateUserRequest {
     pub address_country: String,
     pub address_postalcode: String,
     pub employee_status: String,
-    pub messanger_id: String,
-    pub messanger_type: String,
+    pub messenger_id: String,
+    pub messenger_type: String,
     pub reports_to_id: String,
     pub factor_auth: bool,
+    pub whatsapp: String,
+    pub telegram: String,
 }
 
 #[derive(Serialize, Deserialize, Debug, Validate)]
@@ -101,4 +127,3 @@ pub struct EmailExistsRequest {
 pub struct UsernameExistsRequest {
     pub username: String,
 }
-

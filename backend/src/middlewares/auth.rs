@@ -1,9 +1,8 @@
 use core::fmt;
 use async_trait::async_trait;
-use futures::executor::block_on;
 use mobc_redis::redis::AsyncCommands;
 use nonblock_logger::info;
-use std::future::{ready, Ready};
+use std::future::Future;
 use actix_web::{FromRequest, HttpRequest, dev};
 use serde::{Deserialize, Serialize};
 
@@ -37,10 +36,10 @@ pub struct AuthorizationService {
 #[async_trait]
 impl FromRequest for AuthorizationService {
     type Error = actix_web::Error;
-    type Future = Ready<Result<AuthorizationService, Self::Error>>;
+    type Future = std::pin::Pin<Box<dyn Future<Output=Result<Self,Self::Error> >  > > ;
 
     fn from_request(req: &HttpRequest, _payload: &mut dev::Payload) -> Self::Future {
-        let state = req.app_data::<AppStateRaw>().expect("get AppStateRaw");
+        let state = req.app_data::<AppStateRaw>().unwrap().clone();
 
         let xsrf_token_header = req
             .headers()
@@ -50,7 +49,7 @@ impl FromRequest for AuthorizationService {
         let xsrf_token = match xsrf_token_header {
             Some(x) => x.to_owned(),
             None => {
-                return ready(Err(actix_web::error::ErrorBadRequest("Wrong XSRF token.").into()));
+                return Box::pin(async move{Err(actix_web::error::ErrorBadRequest("Wrong XSRF token.").into())});
             }
         };
 
@@ -58,14 +57,14 @@ impl FromRequest for AuthorizationService {
             Some(c) => c.to_string(),
             None => {
                 info!("semi step 2");
-                return ready(Err(actix_web::error::ErrorBadRequest("Wrong XSRF token.").into()));
+                return Box::pin(async move{Err(actix_web::error::ErrorBadRequest("Wrong XSRF token.").into())});
             }
         };
 
         access_token = match access_token.split_once("=") {
             Some(v) => v.1.to_owned(),
             None => {
-                return ready(Err(actix_web::error::ErrorBadRequest("Wrong access token.").into()));
+                return Box::pin(async move{Err(actix_web::error::ErrorBadRequest("Wrong access token.").into())});
             }
         };
 
@@ -76,7 +75,7 @@ impl FromRequest for AuthorizationService {
         ) {
             Ok(token_details) => token_details,
             Err(e) => {
-                return ready(Err(actix_web::error::ErrorUnauthorized(e).into()));
+                return Box::pin(async move{Err(actix_web::error::ErrorUnauthorized(e).into())});
             }
         };
 
@@ -85,11 +84,12 @@ impl FromRequest for AuthorizationService {
             uuid::Uuid::parse_str(&access_token_details.token_uuid.to_string()).unwrap();
         
         if xsrf_token != access_token_uuid.clone().to_string() {
-            return ready(Err(actix_web::error::ErrorBadRequest("Wrong XSRF token.").into()));
+            return Box::pin(async move{Err(actix_web::error::ErrorBadRequest("Wrong XSRF token.").into())});
         }
 
         info!("step 4");
-        let user_id_redis_result = async move {
+        // let user_id_redis_result = async move {
+        Box::pin(async move{
             let mut redis_client = match state.kv.get().await {
                 Ok(redis_client) => redis_client,
                 Err(e) => {
@@ -100,21 +100,18 @@ impl FromRequest for AuthorizationService {
                 }
             };
 
-            match redis_client
+            let user_id = match redis_client
                 .get::<_, String>(access_token_uuid.clone().to_string())
                 .await
             {
-                Ok(value) => Ok(value),
-                Err(e) => Err(actix_web::error::ErrorUnauthorized(ErrorResponse {
-                    status: "fail".to_string(),
-                    message: format!("Token is invalid or session has expired: {:?}", e),
-                })),
-            }
-        };
-
-        let user_exists_result = async move {
-            let user_id = user_id_redis_result.await?;
-
+                Ok(value) => value,
+                Err(e) => {
+                    return Err(actix_web::error::ErrorUnauthorized(ErrorResponse {
+                        status: "fail".to_string(),
+                        message: format!("Token is invalid or session has expired: {:?}", e),
+                    }));
+                }
+            };
             let query_result =
                 sqlx::query_as!(User, 
                     "SELECT id, first_name, last_name, username, email, password_hash, created_date, modified_date,
@@ -125,7 +122,7 @@ impl FromRequest for AuthorizationService {
                 .await;
 
             match query_result {
-                Ok(Some(user)) => Ok(user),
+                Ok(Some(user)) => Ok(AuthorizationService { user, xsrf_token: access_token_uuid.to_string() }),
                 Ok(None) => {
                     let json_error = ErrorResponse {
                         status: "fail".to_string(),
@@ -141,15 +138,6 @@ impl FromRequest for AuthorizationService {
                     Err(actix_web::error::ErrorInternalServerError(json_error))
                 }
             }
-        };
-
-        match block_on(user_exists_result) {
-            Ok(user) => ready(Ok(AuthorizationService {
-                user,
-                xsrf_token: access_token_uuid.to_string(),
-            })),
-            Err(e) => ready(Err(e.into()
-            ))
-        }
+        })
     }
 }

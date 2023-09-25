@@ -4,12 +4,6 @@
 	import * as api from '../../../lib/api.js';
 	import { enhance } from '$app/forms';
 
-	let selected = 'regular';
-	let roles = [
-		{ value: 'admin', name: 'Administrator' },
-		{ value: 'regular', name: 'Normal User' }
-	];
-
 	let selected_status = 'active';
 	let statuses = [
 		{ value: 'active', name: 'Active' },
@@ -19,7 +13,6 @@
 
 	let error = '';
 	let emailExists = '';
-	let usernameExists = '';
 
 	async function checkEmail() {
 		const email = document.getElementById('email')?.value;
@@ -42,6 +35,8 @@
 		}
 	}
 
+	let usernameExists = '';
+
 	async function checkUsername() {
 		const username = document.getElementById('username')?.value;
 
@@ -59,6 +54,17 @@
 			error = 'An error occurred. Please contact support.';
 		}
 	}
+
+	let equalPasswords = '';
+
+	async function checkPasswords() {
+		const password = document.getElementById('password')?.value;
+		const confirmPassword = document.getElementById('confirmPassword')?.value;
+
+		if(password !== confirmPassword) {
+			equalPasswords = 'Password and confirm password must match';
+		}
+	}
 </script>
 
 <main class="bg-gray-100 overflow-hidden relative m-2">
@@ -74,41 +80,45 @@
 		<form action="?/create" class="bg-white m-2 p-1" use:enhance method="POST">
 			<div class="grid gap-6 mb-6 md:grid-cols-4 gap-6 mt-10 p-2">
 				<div>
-					<Label for="firstName" class="mb-2 text-red-500">First name*</Label>
+					<Label for="firstName" class="mb-2">First name<span class="text-red-500">*</span></Label>
 					<Input
 						name="firstName"
 						type="text"
 						id="firstName"
 						minlength="2"
+						maxlength="255"
 						placeholder="John"
 						required
 					/>
 				</div>
 				<div>
-					<Label for="lastName" class="mb-2 text-red-500">Last name*</Label>
+					<Label for="lastName" class="mb-2">Last name<span class="text-red-500">*</span></Label>
 					<Input
 						name="lastName"
 						type="text"
 						id="lastName"
 						minlength="2"
+						maxlength="255"
 						placeholder="Doe"
 						required
 					/>
 				</div>
 				<div class="mb-6">
 					<Label for="title" class="mb-2">Job Title</Label>
-					<Input name="title" type="text" id="text" placeholder="Sales Executive" />
+					<Input name="title" type="text" maxlength="50" id="text" placeholder="Sales Executive" />
 				</div>
 				<div>
 					<Label for="company" class="mb-2">Department</Label>
-					<Input name="department" type="text" id="company" placeholder="Technology" />
+					<Input name="department" type="text" maxlength="255" id="company" placeholder="Technology" />
 				</div>
 				<div class="mb-6">
-					<Label for="email" class="mb-2 text-red-500">Email*</Label>
+					<Label for="email" class="mb-2">Email<span class="text-red-500">*</span></Label>
 					<Input
 						type="email"
 						id="email"
 						name="email"
+						minlength="3"
+						maxlength="256"
 						placeholder="email@domain.com"
 						on:input={checkEmail}
 						required
@@ -116,11 +126,12 @@
 					<span class="red text-xs text-red-700">{emailExists}</span>
 				</div>
 				<div class="mb-6">
-					<Label for="user" class="mb-2 text-red-500">Username*</Label>
+					<Label for="user" class="mb-2">Username<span class="text-red-500">*</span></Label>
 					<Input
 						name="username"
 						type="text"
 						id="username"
+						maxlenght="64"
 						placeholder="john231"
 						on:input={checkUsername}
 						required
@@ -128,36 +139,30 @@
 					<span class="red text-xs text-red-700">{usernameExists}</span>
 				</div>
 				<div class="mb-6">
-					<Label for="password" class="mb-2 text-red-500">Password*</Label>
+					<Label for="password" class="mb-2">Password<span class="text-red-500">*</span></Label>
 					<Input
 						name="password"
 						type="password"
 						id="password"
 						minlength="16"
+						maxlength="64"
 						placeholder="•••••••••"
 						required
 					/>
 				</div>
 				<div class="mb-6">
-					<Label for="confirmPassword" class="mb-2 text-red-500">Confirm Password*</Label>
+					<Label for="confirmPassword" class="mb-2">Confirm Password<span class="text-red-500">*</span></Label>
 					<Input
 						name="confirmPassword"
 						type="password"
 						id="confirmPassword"
 						minlength="16"
+						maxlength="64"
 						placeholder="•••••••••"
+						on:change={checkPasswords}
 						required
 					/>
-				</div>
-				<div class="mb-6">
-					<p class="mb-4 text-gray-900 dark:text-white">System Administrator</p>
-					<Toggle name="isAdmin" />
-				</div>
-				<div class="mb-6">
-					<Label>
-						Role
-						<Select class="mt-2" name="role" items={roles} bind:value={selected} />
-					</Label>
+					<span class="red text-xs text-red-700">{equalPasswords}</span>
 				</div>
 				<div class="mb-6">
 					<Label>
@@ -187,31 +192,31 @@
 				</div>
 				<div class="mb-6">
 					<Label for="addressStreet" class="mb-2">Address Street</Label>
-					<Input name="addressStreet" type="text" id="addressStreet" />
+					<Input name="addressStreet" maxlength="255" type="text" id="addressStreet" />
 				</div>
 				<div class="mb-6">
 					<Label for="addressCity" class="mb-2">City</Label>
-					<Input name="addressCity" type="text" id="addressCity" />
+					<Input name="addressCity" maxlength="100" type="text" id="addressCity" />
 				</div>
 				<div class="mb-6">
 					<Label for="addressState" class="mb-2">State</Label>
-					<Input name="addressState" type="text" id="addressState" />
+					<Input name="addressState" maxlength="100" type="text" id="addressState" />
 				</div>
 				<div class="mb-6">
 					<Label for="addressCountry" class="mb-2">Country</Label>
-					<Input name="addressCountry" type="text" id="addressCountry" />
+					<Input name="addressCountry" maxlength="100" type="text" id="addressCountry" />
 				</div>
 				<div class="mb-6">
 					<Label for="addressPostalcode" class="mb-2">Postal Code</Label>
-					<Input name="addressPostalcode" type="text" id="addressPostalcode" />
+					<Input name="addressPostalcode" maxlength="20" type="text" id="addressPostalcode" />
 				</div>
 				<div class="mb-6">
 					<Label for="whatsapp" class="mb-2">Whatsapp No.</Label>
-					<Input name="whatsapp" type="text" id="whatsapp" />
+					<Input name="whatsapp" type="tel" id="whatsapp" />
 				</div>
 				<div class="mb-6">
 					<Label for="telegram" class="mb-2">Telegram No.</Label>
-					<Input name="telegram" type="text" id="telegram" />
+					<Input name="telegram" type="tel" id="telegram" />
 				</div>
 				<div class="mb-6">
 					<Label for="reportsToId" class="mb-2">Reports To</Label>
@@ -220,11 +225,15 @@
 					</Search>
 				</div>
 				<div class="mb-6">
+					<p class="mb-4 text-gray-900 dark:text-white">System Administrator</p>
+					<Toggle name="isAdmin" />
+				</div>
+				<div class="mb-6">
 					<Label for="factorAuth" class="mb-2">2FA</Label>
 					<Toggle name="factorAuth" id="factorAuth" />
 				</div>
 			</div>
-			<Button type="submit">Add User</Button>
+				<Button type="submit">Add User</Button>
 		</form>
 	</div>
 </main>
