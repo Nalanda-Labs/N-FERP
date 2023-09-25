@@ -148,8 +148,7 @@ impl FromRequest for AuthorizationService {
                 user,
                 xsrf_token: access_token_uuid.to_string(),
             })),
-            Err(e) => ready(Err(e.into()
-            ))
+            Err(e) => ready(Err(e.into()))
         }
     }
 }

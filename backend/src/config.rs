@@ -8,6 +8,7 @@ use nonblock_logger::{
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 use std::sync::Arc;
+use std::time::Duration;
 
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
 pub struct Config {
@@ -51,6 +52,7 @@ impl Config {
         let kv = KvPool::builder()
             .max_open(200)
             .max_idle(100)
+            .get_timeout(Some(Duration::new(0, 2000 * 1000 *1000)))
             .build(kvm);
         Arc::new(State {
             config: self,
@@ -64,16 +66,6 @@ impl Config {
         println!("{}", serde_json::to_string_pretty(&de).unwrap())
     }
 }
-
-// pub fn version_with_gitif() -> &'static str {
-//     concat!(
-//         env!("CARGO_PKG_VERSION"),
-//         " ",
-//         env!("VERGEN_GIT_COMMIT_DATE"),
-//         ": ",
-//         env!("VERGEN_GIT_SHA_SHORT")
-//     )
-// }
 
 #[derive(clap::Parser, Debug)]
 #[clap(name = "template")]

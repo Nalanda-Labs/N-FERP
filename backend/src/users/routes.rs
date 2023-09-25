@@ -406,32 +406,34 @@ async fn users_handler(
     }
 }
 
-// #[post("/user/create")]
-// async fn create_user_handler(
-//     req: web::Json<CreateUserRequest>,
-//     auth_guard: auth::AuthorizationService,
-//     state: AppState,
-// ) -> impl Responder {
-//     let current_user = auth_guard.user;
-//     if !current_user.is_admin {
-//         HttpResponse::Forbidden().json(
-//             &json!({"status": "error", "message": "create user is not available to normal user."}),
-//         )
-//     } else {
-//         match state
-//             .get_ref()
-//             .create_user(&req)
-//             .await
-//         {
-//             Ok((id)) => HttpResponse::Ok().json(&json!({"status": "success", "id": id})),
-//             Err(e) => {
-//                 info!("{:?}", e);
-//                 HttpResponse::InternalServerError()
-//                     .json(&json!({"status": "fail", "errors": "Internal Server Error"}))
-//             }
-//         }
-//     }
-// }
+#[post("/user/create")]
+async fn create_user_handler(
+    req: web::Json<CreateUserRequest>,
+    auth_guard: auth::AuthorizationService,
+    state: AppState,
+) -> impl Responder {
+    let current_user = auth_guard.user;
+    if !current_user.is_admin {
+        HttpResponse::Forbidden().json(
+            &json!({"status": "error", "message": "create user is not available to normal user."}),
+        )
+    } else {
+        if req.password != req.confirm_password {
+            return HttpResponse::BadRequest().json(
+                &json!({"status": "fail", "errors": "Password and confirm password must be equal"}),
+            );
+        }
+
+        match state.get_ref().create_user(&req).await {
+            Ok(id) => HttpResponse::Ok().json(&json!({"status": "success", "id": id})),
+            Err(e) => {
+                info!("{:?}", e);
+                HttpResponse::InternalServerError()
+                    .json(&json!({"status": "fail", "errors": "Internal Server Error"}))
+            }
+        }
+    }
+}
 
 #[post("/email-exists")]
 async fn email_exists(
@@ -473,4 +475,5 @@ pub fn init(cfg: &mut web::ServiceConfig) {
     cfg.service(logout_handler);
     cfg.service(email_exists);
     cfg.service(username_exists);
+    cfg.service(create_user_handler);
 }
