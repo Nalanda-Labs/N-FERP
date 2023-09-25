@@ -19,7 +19,7 @@ export const actions = {
 		let text = await resp.text();
 		let j = text ? JSON.parse(text) : {};
 
-		if (j.message) {
+		if (j.success === 'fail') {
 			return { success: false, message: j.message, email:data.get('email'), password: data.get('password') };
 		}
 

@@ -1,4 +1,4 @@
-import { fail, redirect } from '@sveltejs/kit';
+import { error, redirect } from '@sveltejs/kit';
 import * as api from '../../../lib/api.js';
 
 /** @type {import('./$types').PageServerLoad} */
@@ -62,7 +62,7 @@ export const actions = {
 		let j = text ? JSON.parse(text) : {};
 
 		if (j.success === 'fail') {
-			return fail(resp.status, j.errors);
+			throw error(resp.status, j.message);
 		}
 
 		throw redirect(307, `/user/${j.id}`);

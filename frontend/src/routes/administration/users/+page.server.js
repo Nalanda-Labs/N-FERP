@@ -13,8 +13,9 @@ export async function load({ locals, request, cookies }) {
 
 	let text = await resp.text();
 	let data = text ? JSON.parse(text) : {};
-	if (data.errors) {
-		return error(401, {message: data.errors});
+
+	if (data.success === 'fail') {
+		throw error(401, {message: data.message});
 	}
 
 	return data;
