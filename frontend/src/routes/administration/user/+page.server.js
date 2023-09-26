@@ -1,4 +1,4 @@
-import { fail, redirect } from '@sveltejs/kit';
+import { error, redirect } from '@sveltejs/kit';
 import * as api from '../../../lib/api.js';
 
 /** @type {import('./$types').PageServerLoad} */
@@ -12,15 +12,15 @@ export const actions = {
 		let data = await request.formData();
 		let isAdmin = data.get('isAdmin');
 
-		if(isAdmin === null) {
+		if (isAdmin === null) {
 			isAdmin = false;
 		} else {
 			isAdmin = true;
 		}
 
-		let factorAuth = data.get('factorAuth'); 
+		let factorAuth = data.get('factorAuth');
 
-		if(factorAuth === null) {
+		if (factorAuth === null) {
 			factorAuth = false;
 		} else {
 			factorAuth = true;
@@ -62,9 +62,9 @@ export const actions = {
 		let j = text ? JSON.parse(text) : {};
 
 		if (j.success === 'fail') {
-			return fail(resp.status, j.errors);
+			throw error(resp.status, j.message);
 		}
 
-		throw redirect(307, `/user/${j.id}`);
+		throw redirect(307, `/administration/user/${j.id}`);
 	}
 };

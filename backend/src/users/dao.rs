@@ -64,21 +64,27 @@ impl IUser for &AppStateRaw {
             None => 0 as u64,
         };
 
+        let mut sort_by_col = sort_by;
+
+        if sort_by == "" {
+            sort_by_col = "first_name";
+        }
+
         let q: String;
 
         if ascending {
             q = format!(
                 "SELECT id, first_name, last_name, username, email, password_hash, created_date,
                 modified_date, is_admin, status, department
-                FROM users where deleted=false and {sort_by} > '{last_record}' order by {sort_by} limit {results_per_page}",
-                sort_by=sort_by, last_record=last_record, results_per_page=self.config.results_per_page
+                FROM users where deleted=false and {sort_by_col} > '{last_record}' order by {sort_by_col} limit {results_per_page}",
+                sort_by_col=sort_by_col, last_record=last_record, results_per_page=self.config.results_per_page
             );
         } else {
             q = format!(
                 "SELECT id, first_name, last_name, username, email, password_hash, created_date,
                 modified_date, is_admin, status, department
-                FROM users where deleted=false and {sort_by} < '{last_record}' order by {sort_by} DESC limit {results_per_page}",
-                sort_by=sort_by, last_record=last_record, results_per_page=self.config.results_per_page
+                FROM users where deleted=false and {sort_by_col} < '{last_record}' order by {sort_by_col} DESC limit {results_per_page}",
+                sort_by_col=sort_by_col, last_record=last_record, results_per_page=self.config.results_per_page
             );
         }
 

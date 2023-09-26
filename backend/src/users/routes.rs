@@ -136,7 +136,7 @@ async fn login(form: web::Json<Login>, state: AppState) -> impl Responder {
                 };
                 resp
             } else {
-                HttpResponse::Unauthorized().finish()
+                HttpResponse::Unauthorized().json(&json!({"message": "Username or password is wrong!"}))
             }
         }
         Err(e) => {
@@ -350,7 +350,7 @@ async fn logout_handler(
 
     if redis_result.is_err() {
         return HttpResponse::UnprocessableEntity().json(
-            &json!({"status": "error", "message": format_args!("{:?}", redis_result.unwrap_err())}),
+            &json!({"status": "fail", "message": format_args!("{:?}", redis_result.unwrap_err())}),
         );
     }
 
@@ -388,7 +388,7 @@ async fn users_handler(
     let current_user = auth_guard.user;
     if !current_user.is_admin {
         HttpResponse::Forbidden().json(
-            &json!({"status": "error", "message": "Users page is not available to normal user."}),
+            &json!({"status": "fail", "message": "Users page is not available to normal user."}),
         )
     } else {
         match state
@@ -400,7 +400,7 @@ async fn users_handler(
             Err(e) => {
                 info!("{:?}", e);
                 HttpResponse::InternalServerError()
-                    .json(&json!({"status": "fail", "errors": "Internal Server Error"}))
+                    .json(&json!({"status": "fail", "message": "Internal Server Error"}))
             }
         }
     }
@@ -415,12 +415,12 @@ async fn create_user_handler(
     let current_user = auth_guard.user;
     if !current_user.is_admin {
         HttpResponse::Forbidden().json(
-            &json!({"status": "error", "message": "create user is not available to normal user."}),
+            &json!({"status": "fail", "message": "Create user is not available to normal user."}),
         )
     } else {
         if req.password != req.confirm_password {
             return HttpResponse::BadRequest().json(
-                &json!({"status": "fail", "errors": "Password and confirm password must be equal"}),
+                &json!({"status": "fail", "messsage": "Password and confirm password must be equal"}),
             );
         }
 
@@ -429,7 +429,7 @@ async fn create_user_handler(
             Err(e) => {
                 info!("{:?}", e);
                 HttpResponse::InternalServerError()
-                    .json(&json!({"status": "fail", "errors": "Internal Server Error"}))
+                    .json(&json!({"status": "fail", "message": "Internal Server Error"}))
             }
         }
     }
@@ -447,7 +447,7 @@ async fn email_exists(
         Err(e) => {
             info!("{:?}", e);
             HttpResponse::InternalServerError()
-                .json(&json!({"status": "fail", "error": e.to_string()}))
+                .json(&json!({"status": "fail", "message": e.to_string()}))
         }
     }
 }
@@ -464,7 +464,7 @@ async fn username_exists(
         Err(e) => {
             info!("{:?}", e);
             HttpResponse::InternalServerError()
-                .json(&json!({"status": "fail", "error": e.to_string()}))
+                .json(&json!({"status": "fail", "message": e.to_string()}))
         }
     }
 }
@@ -476,4 +476,5 @@ pub fn init(cfg: &mut web::ServiceConfig) {
     cfg.service(email_exists);
     cfg.service(username_exists);
     cfg.service(create_user_handler);
+    cfg.service(users_handler);
 }

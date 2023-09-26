@@ -45,6 +45,7 @@ impl Login {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
 pub struct UsersRequest {
     pub sort_by: String,
     pub last_record: String,

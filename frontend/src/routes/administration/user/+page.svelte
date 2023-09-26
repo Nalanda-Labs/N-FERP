@@ -1,4 +1,5 @@
 <script>
+	import { page } from '$app/stores';
 	import { Input, Label, Button, Select, Toggle, Search, Alert } from 'flowbite-svelte';
 	import { InfoCircleSolid } from 'flowbite-svelte-icons';
 	import * as api from '../../../lib/api.js';
@@ -66,7 +67,7 @@
 		}
 	}
 </script>
-
+{#if $page.data.user?.isAdmin}
 <main class="bg-gray-100 overflow-hidden relative m-2">
 	<div class="bg-white m-2">
 		<h1 class="ml-2 mt-2 bg-white text-4xl font-extrabold dark:text-white p-2">Add User</h1>
@@ -237,3 +238,15 @@
 		</form>
 	</div>
 </main>
+{:else}
+<div>
+<h1 class="only-admin">Only admins are allowed to view this!</h1>
+</div>
+{/if}
+<style>
+	.only-admin {
+		font-size: 4em;
+		margin: 4em 0;
+		text-align: center;
+	}
+</style>

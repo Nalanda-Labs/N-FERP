@@ -38,12 +38,10 @@ impl Config {
     pub fn parse_from_file(file: &PathBuf) -> Self {
         use std::fs::read_to_string;
 
-        info!("confp: {}", file.display());
         let confstr = read_to_string(file).expect("confile read");
         json5::from_str(&confstr).expect("confile deser")
     }
     pub async fn into_state(self) -> AppStateRaw {
-        info!("config: {:?}", self);
         let pool_options = PoolOptions::new();
 
         let sql = pool_options.connect(&self.sql).await.expect("sql open");
