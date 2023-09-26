@@ -18,6 +18,9 @@
 			item.toLowerCase().match(inputValue.toLowerCase())
 		));
 	};
+	// const setValue = (input) => {
+	// 	inputValue = input;
+	// };
 </script>
 
 <svelte:head>
@@ -39,43 +42,14 @@
 				id="default-search"
 				bind:value={inputValue}
 				on:input={handleInput}
-				class="block p-4 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+				class="block p-2 border border-gray-300 rounded-lg"
 				placeholder="Search Mockups, Logos..."
 			/>
 			<div>
-				{#if filteredItems.length > 0}
-					{#each filteredItems as item}
-						<Link link={item} />
-					{/each}
-				{:else}
-					{#each menuItems as item}
-						<Link link={item} />
-					{/each}
-				{/if}
+				{#each filteredItems as item}
+					<Link link={item} />
+				{/each}
 			</div>
 		</div>
 	</form>
 </main>
-
-<!-- <div class="mb-6">
-	<Label for="reportsToId" class="mb-2">Reports To</Label>
-	<Search name="reportsToId" type="text" id="reportsToId">
-		<Button>Search</Button>
-	</Search>
-</div> -->
-
-<style>
-	/* .dropdown {
-  position: relative;
-  display: inline-block;
-} */
-
-	/* .dropdown-content {
-		display: none;
-		position: absolute;
-		background-color: #f6f6f6;
-		min-width: 230px;
-		border: 1px solid #ddd;
-		z-index: 1;
-	} */
-</style>
