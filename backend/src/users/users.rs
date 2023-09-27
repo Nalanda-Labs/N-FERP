@@ -119,6 +119,40 @@ pub struct CreateUserRequest {
 }
 
 #[derive(Serialize, Deserialize, Debug, Validate)]
+#[serde(rename_all = "camelCase")]
+pub struct EditUserRequest {
+    #[validate(email)]
+    pub email: String,
+    pub username: String,
+    #[validate(length(min = 2))]
+    pub first_name: String,
+    #[validate(length(min = 2))]
+    pub last_name: String,
+    pub is_admin: bool,
+    pub title: String,
+    pub department: String,
+    pub phone_home: String,
+    pub phone_mobile: String,
+    pub phone_work: String,
+    pub phone_other: String,
+    pub phone_fax: String,
+    #[validate(custom = "validate_status")]
+    pub status: String,
+    pub address_street: String,
+    pub address_city: String,
+    pub address_state: String,
+    pub address_country: String,
+    pub address_postalcode: String,
+    pub employee_status: String,
+    pub messenger_id: String,
+    pub messenger_type: String,
+    pub reports_to_id: String,
+    pub factor_auth: bool,
+    pub whatsapp: String,
+    pub telegram: String,
+}
+
+#[derive(Serialize, Deserialize, Debug, Validate)]
 pub struct EmailExistsRequest {
     #[validate(email)]
     pub email: String,
@@ -127,4 +161,33 @@ pub struct EmailExistsRequest {
 #[derive(Serialize, Deserialize, Debug, Validate)]
 pub struct UsernameExistsRequest {
     pub username: String,
+}
+
+#[derive(Serialize, Deserialize, Debug, Validate)]
+#[serde(rename_all = "camelCase")]
+pub struct UserResponse {
+    pub email: String,
+    pub username: String,
+    #[validate(length(min = 2))]
+    pub first_name: String,
+    #[validate(length(min = 2))]
+    pub last_name: String,
+    pub is_admin: bool,
+    pub title: String,
+    pub department: String,
+    pub phone_home: String,
+    pub phone_mobile: String,
+    pub phone_work: String,
+    pub phone_other: String,
+    pub phone_fax: String,
+    pub status: String,
+    pub address_street: String,
+    pub address_city: String,
+    pub address_state: String,
+    pub address_country: String,
+    pub address_postalcode: String,
+    pub reports_to_id: Option<Uuid>,
+    pub factor_auth: bool,
+    pub whatsapp: String,
+    pub telegram: String,
 }

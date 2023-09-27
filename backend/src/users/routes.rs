@@ -136,7 +136,8 @@ async fn login(form: web::Json<Login>, state: AppState) -> impl Responder {
                 };
                 resp
             } else {
-                HttpResponse::Unauthorized().json(&json!({"message": "Username or password is wrong!"}))
+                HttpResponse::Unauthorized()
+                    .json(&json!({"message": "Username or password is wrong!"}))
             }
         }
         Err(e) => {
@@ -435,6 +436,31 @@ async fn create_user_handler(
     }
 }
 
+#[post("/user/edit/{id}")]
+async fn edit_user_handler(
+    req: web::Json<EditUserRequest>,
+    params: web::Path<Uuid>,
+    auth_guard: auth::AuthorizationService,
+    state: AppState,
+) -> impl Responder {
+    let current_user = auth_guard.user;
+    if !current_user.is_admin {
+        HttpResponse::Forbidden().json(
+            &json!({"status": "fail", "message": "Create user is not available to normal user."}),
+        )
+    } else {
+        let id = params.into_inner();
+        match state.get_ref().edit_user(&req, &id).await {
+            Ok(id) => HttpResponse::Ok().json(&json!({"status": "success", "id": id})),
+            Err(e) => {
+                info!("{:?}", e);
+                HttpResponse::InternalServerError()
+                    .json(&json!({"status": "fail", "message": "Internal Server Error"}))
+            }
+        }
+    }
+}
+
 #[post("/email-exists")]
 async fn email_exists(
     req: web::Json<EmailExistsRequest>,
@@ -469,6 +495,21 @@ async fn username_exists(
     }
 }
 
+#[get("/user/{id}")]
+async fn get_user(params: web::Path<Uuid>, state: AppState) -> impl Responder {
+    let id = params.into_inner();
+    debug!("User id is {}", id);
+    match state.get_ref().get_user(id).await {
+        // the key should not be user else it will conflict with svelte
+        Ok(u) => HttpResponse::Ok().json(&json!({"status": "success", "data": u})),
+        Err(e) => {
+            info!("Error: {:?}", e);
+            HttpResponse::InternalServerError().json(
+            &json!({"status": "fail", "message": "An error occurred. Please contact suppport!"}),)
+        }
+    }
+}
+
 pub fn init(cfg: &mut web::ServiceConfig) {
     cfg.service(login);
     cfg.service(refresh_access_token_handler);
@@ -477,4 +518,6 @@ pub fn init(cfg: &mut web::ServiceConfig) {
     cfg.service(username_exists);
     cfg.service(create_user_handler);
     cfg.service(users_handler);
+    cfg.service(get_user);
+    cfg.service(edit_user_handler);
 }
