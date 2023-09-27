@@ -1,6 +1,7 @@
 use async_trait::async_trait;
 use nonblock_logger::info;
 use sqlx::{Error, Row};
+use uuid::Uuid;
 
 use super::users::*;
 use crate::state::AppStateRaw;
@@ -17,6 +18,8 @@ pub trait IUser: std::ops::Deref<Target = AppStateRaw> {
     async fn email_exists(&self, email: &str) -> sqlx::Result<bool>;
     async fn username_exists(&self, username: &str) -> sqlx::Result<bool>;
     async fn create_user(&self, req: &CreateUserRequest) -> sqlx::Result<String>;
+    async fn edit_user(&self, req: &EditUserRequest, id: &Uuid) -> sqlx::Result<String>;
+    async fn get_user(&self, id: Uuid) -> sqlx::Result<UserResponse>;
 }
 
 #[cfg(any(feature = "postgres"))]
@@ -218,6 +221,81 @@ impl IUser for &AppStateRaw {
 
         tx.commit().await?;
         return Ok(id.to_string());
+    }
 
+    async fn edit_user(&self, req: &EditUserRequest, id: &Uuid) -> sqlx::Result<String> {
+        let mut tx = self.sql.begin().await?;
+
+        let r = sqlx::query!(
+            r#"
+            SELECT id from users where username=$1
+            "#,
+            req.reports_to_id
+        )
+        .fetch_optional(&mut *tx)
+        .await?;
+
+        let reports_to_id = match r {
+            Some(rec) => match rec.id {
+                id => id.to_string(),
+            },
+            None => "".to_owned(),
+        };
+
+        if reports_to_id != "" {
+            let reports_to = uuid::Uuid::parse_str(&reports_to_id).unwrap();
+            sqlx::query!(
+                r#"
+                UPDATE users set email=$2, first_name=$3, last_name=$4, username=$5,
+                is_admin=$6, title=$7, department=$8, phone_home=$9, phone_mobile=$10,
+                phone_work=$11, phone_other=$12, phone_fax=$13, status=$14, address_street=$15,
+                address_city=$16, address_state=$17, address_country=$18, address_postalcode=$19,
+                reports_to_id=$20, factor_auth=$21, whatsapp=$22, telegram=$23 where id=$1
+                "#,
+                id, &req.email, &req.first_name, &req.last_name, &req.username,
+                &req.is_admin, &req.title, &req.department, &req.phone_home, &req.phone_mobile,
+                &req.phone_work, &req.phone_other, &req.phone_fax, &req.status, &req.address_street,
+                &req.address_city, &req.address_state, &req.address_country, &req.address_postalcode,
+                reports_to, req.factor_auth, &req.whatsapp, &req.telegram
+            )
+            .execute(&mut *tx)
+            .await?;
+        } else {
+            sqlx::query!(
+                r#"
+                UPDATE users set email=$2, first_name=$3, last_name=$4, username=$5,
+                is_admin=$6, title=$7, department=$8, phone_home=$9, phone_mobile=$10,
+                phone_work=$11, phone_other=$12, phone_fax=$13, status=$14, address_street=$15,
+                address_city=$16, address_state=$17, address_country=$18, address_postalcode=$19,
+                factor_auth=$20, whatsapp=$21, telegram=$22 where id=$1
+                "#,
+                id, &req.email, &req.first_name, &req.last_name, &req.username,
+                &req.is_admin, &req.title, &req.department, &req.phone_home, &req.phone_mobile,
+                &req.phone_work, &req.phone_other, &req.phone_fax, &req.status, &req.address_street,
+                &req.address_city, &req.address_state, &req.address_country, &req.address_postalcode,
+                req.factor_auth, &req.whatsapp, &req.telegram
+            )
+            .execute(&mut *tx)
+            .await?;
+        }
+
+        tx.commit().await?;
+        return Ok(id.to_string());
+    }
+    async fn get_user(&self, id: Uuid) -> sqlx::Result<UserResponse> {
+        let u = sqlx::query_as!(UserResponse,
+            r#"
+            SELECT email, username, first_name, last_name, is_admin, title, department, phone_home,
+            phone_mobile, phone_work, phone_other, phone_fax, status, address_street, address_city,
+            address_state, address_country, address_postalcode, reports_to_id, factor_auth, whatsapp,
+            telegram
+            from users where id=$1
+            "#,
+            id
+        )
+        .fetch_one(&self.sql)
+        .await?;
+
+        Ok(u)
     }
 }
