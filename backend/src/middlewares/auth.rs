@@ -2,8 +2,9 @@ use core::fmt;
 use async_trait::async_trait;
 use mobc_redis::redis::AsyncCommands;
 use nonblock_logger::info;
+use ntex::http::HttpMessage;
 use std::future::Future;
-use actix_web::{FromRequest, HttpRequest, dev};
+use ntex::web::{FromRequest, HttpRequest, DefaultError};
 use serde::{Deserialize, Serialize};
 
 use crate::state::AppStateRaw;
@@ -16,7 +17,7 @@ struct QueryParams {
 }
 
 #[derive(Debug, Serialize)]
-struct ErrorResponse {
+pub struct ErrorResponse {
     status: String,
     message: String,
 }
@@ -34,12 +35,12 @@ pub struct AuthorizationService {
 }
 
 #[async_trait]
-impl FromRequest for AuthorizationService {
-    type Error = actix_web::Error;
-    type Future = std::pin::Pin<Box<dyn Future<Output=Result<Self,Self::Error> >  > > ;
+impl<Err> FromRequest<Err> for AuthorizationService {
+    type Error = ntex::web::error::InternalError<ErrorResponse, DefaultError>;
+    type Future = std::pin::Pin<Box<dyn Future<Output=Result<Self,Self::Error>>>> ;
 
-    fn from_request(req: &HttpRequest, _payload: &mut dev::Payload) -> Self::Future {
-        let state = req.app_data::<AppStateRaw>().unwrap().clone();
+    fn from_request(req: &HttpRequest, _payload: &mut ntex::http::Payload) -> Self::Future {
+        let state = req.app_state::<AppStateRaw>().unwrap().clone();
 
         let xsrf_token_header = req
             .headers()
@@ -49,7 +50,9 @@ impl FromRequest for AuthorizationService {
         let xsrf_token = match xsrf_token_header {
             Some(x) => x.to_owned(),
             None => {
-                return Box::pin(async move{Err(actix_web::error::ErrorBadRequest("Wrong XSRF token.").into())});
+                return Box::pin(async move{Err(ntex::web::error::ErrorBadRequest(ErrorResponse {
+                    status: "fail".to_string(),
+                    message: format!("Wrong XSRF token.")}))});
             }
         };
 
@@ -57,14 +60,18 @@ impl FromRequest for AuthorizationService {
             Some(c) => c.to_string(),
             None => {
                 info!("semi step 2");
-                return Box::pin(async move{Err(actix_web::error::ErrorBadRequest("Wrong XSRF token.").into())});
+                return Box::pin(async move{Err(ntex::web::error::ErrorBadRequest(ErrorResponse {
+                    status: "fail".to_string(),
+                    message: format!("Wrong XSRF token.")}))});
             }
         };
 
         access_token = match access_token.split_once("=") {
             Some(v) => v.1.to_owned(),
             None => {
-                return Box::pin(async move{Err(actix_web::error::ErrorBadRequest("Wrong access token.").into())});
+                return Box::pin(async move{Err(ntex::web::error::ErrorBadRequest(ErrorResponse {
+                    status: "fail".to_string(),
+                        message: format!("Wrong access token.")}))});
             }
         };
 
@@ -75,7 +82,9 @@ impl FromRequest for AuthorizationService {
         ) {
             Ok(token_details) => token_details,
             Err(e) => {
-                return Box::pin(async move{Err(actix_web::error::ErrorUnauthorized(e).into())});
+                return Box::pin(async move{Err(ntex::web::error::ErrorUnauthorized(ErrorResponse {
+                    status: "fail".to_string(),
+                    message: format!("{}", e)}))});
             }
         };
 
@@ -84,7 +93,9 @@ impl FromRequest for AuthorizationService {
             uuid::Uuid::parse_str(&access_token_details.token_uuid.to_string()).unwrap();
         
         if xsrf_token != access_token_uuid.clone().to_string() {
-            return Box::pin(async move{Err(actix_web::error::ErrorBadRequest("Wrong XSRF token.").into())});
+            return Box::pin(async move{Err(ntex::web::error::ErrorBadRequest(ErrorResponse {
+                status: "fail".to_string(),
+                message: format!("Wrong XSRF token.")}))});
         }
 
         info!("step 4");
@@ -93,7 +104,7 @@ impl FromRequest for AuthorizationService {
             let mut redis_client = match state.kv.get().await {
                 Ok(redis_client) => redis_client,
                 Err(e) => {
-                    return Err(actix_web::error::ErrorInternalServerError(ErrorResponse {
+                    return Err(ntex::web::error::ErrorInternalServerError(ErrorResponse {
                         status: "fail".to_string(),
                         message: format!("Could not connect to Redis: {}", e),
                     }));
@@ -106,7 +117,7 @@ impl FromRequest for AuthorizationService {
             {
                 Ok(value) => value,
                 Err(e) => {
-                    return Err(actix_web::error::ErrorUnauthorized(ErrorResponse {
+                    return Err(ntex::web::error::ErrorUnauthorized(ErrorResponse {
                         status: "fail".to_string(),
                         message: format!("Token is invalid or session has expired: {:?}", e),
                     }));
@@ -128,14 +139,14 @@ impl FromRequest for AuthorizationService {
                         status: "fail".to_string(),
                         message: "the user belonging to this token no logger exists".to_string(),
                     };
-                    Err(actix_web::error::ErrorUnauthorized(json_error))
+                    Err(ntex::web::error::ErrorUnauthorized(json_error))
                 }
                 Err(e) => {
                     let json_error = ErrorResponse {
                         status: "error".to_string(),
                         message: format!("Faled to check user existence: {:?}", e),
                     };
-                    Err(actix_web::error::ErrorInternalServerError(json_error))
+                    Err(ntex::web::error::ErrorInternalServerError(json_error))
                 }
             }
         })

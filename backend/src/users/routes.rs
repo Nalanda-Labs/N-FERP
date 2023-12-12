@@ -3,10 +3,13 @@ use super::users::*;
 use crate::middlewares::auth;
 use crate::state::AppState;
 use crate::users::token;
-use actix_web::{cookie::Cookie, get, post, web, Error, HttpRequest, HttpResponse, Responder};
 use cookie::time::Duration;
+use cookie::Cookie;
 use mobc_redis::redis::{self, AsyncCommands};
 use nonblock_logger::{debug, info};
+use ntex::http::HttpMessage;
+use ntex::web;
+use ntex::web::{get, post, Error, HttpRequest, HttpResponse, Responder};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use uuid::Uuid;
@@ -18,7 +21,7 @@ pub struct LoginResponse {
 }
 
 #[post("/auth/login")]
-async fn login(form: web::Json<Login>, state: AppState) -> impl Responder {
+async fn login(form: web::types::Json<Login>, state: AppState) -> impl Responder {
     let form = form.into_inner();
 
     // todo: distable login for deleted and blocked users
@@ -382,7 +385,7 @@ async fn logout_handler(
 
 #[post("/users")]
 async fn users_handler(
-    req: web::Json<UsersRequest>,
+    req: web::types::Json<UsersRequest>,
     auth_guard: auth::AuthorizationService,
     state: AppState,
 ) -> impl Responder {
@@ -409,7 +412,7 @@ async fn users_handler(
 
 #[post("/user/create")]
 async fn create_user_handler(
-    req: web::Json<CreateUserRequest>,
+    req: web::types::Json<CreateUserRequest>,
     auth_guard: auth::AuthorizationService,
     state: AppState,
 ) -> impl Responder {
@@ -438,8 +441,8 @@ async fn create_user_handler(
 
 #[post("/user/edit/{id}")]
 async fn edit_user_handler(
-    req: web::Json<EditUserRequest>,
-    params: web::Path<Uuid>,
+    req: web::types::Json<EditUserRequest>,
+    params: web::types::Path<Uuid>,
     auth_guard: auth::AuthorizationService,
     state: AppState,
 ) -> impl Responder {
@@ -463,7 +466,7 @@ async fn edit_user_handler(
 
 #[post("/email-exists")]
 async fn email_exists(
-    req: web::Json<EmailExistsRequest>,
+    req: web::types::Json<EmailExistsRequest>,
     _auth_guard: auth::AuthorizationService,
     state: AppState,
 ) -> impl Responder {
@@ -480,7 +483,7 @@ async fn email_exists(
 
 #[post("/username-exists")]
 async fn username_exists(
-    req: web::Json<UsernameExistsRequest>,
+    req: web::types::Json<UsernameExistsRequest>,
     _auth_guard: auth::AuthorizationService,
     state: AppState,
 ) -> impl Responder {
@@ -496,7 +499,7 @@ async fn username_exists(
 }
 
 #[get("/user/{id}")]
-async fn get_user(params: web::Path<Uuid>, state: AppState) -> impl Responder {
+async fn get_user(params: web::types::Path<Uuid>, state: AppState) -> impl Responder {
     let id = params.into_inner();
     debug!("User id is {}", id);
     match state.get_ref().get_user(id).await {
