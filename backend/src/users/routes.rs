@@ -4,7 +4,7 @@ use crate::middlewares::auth;
 use crate::state::AppState;
 use crate::users::token;
 use cookie::time::Duration;
-use cookie::Cookie;
+use cookie::{Cookie};
 use mobc_redis::redis::{self, AsyncCommands};
 use nonblock_logger::{debug, info};
 use ntex::http::HttpMessage;
@@ -121,9 +121,9 @@ async fn login(form: web::types::Json<Login>, state: AppState) -> impl Responder
                 };
                 let resp = match serde_json::to_string(&r) {
                     Ok(json) => HttpResponse::Ok()
-                        .cookie(access_cookie)
-                        .cookie(refresh_cookie)
-                        .cookie(xsrf_cookie)
+                        .cookie(access_cookie.to_string())
+                        .cookie(refresh_cookie.to_string())
+                        .cookie(xsrf_cookie.to_string())
                         .cookie(
                             Cookie::build("logged_in", json)
                                 .domain(&state.config.host)
@@ -131,7 +131,7 @@ async fn login(form: web::types::Json<Login>, state: AppState) -> impl Responder
                                 .secure(true)
                                 .http_only(true)
                                 .max_age(Duration::new(state.config.access_token_max_age * 60, 0))
-                                .finish(),
+                                .finish().to_string(),
                         )
                         .content_type("application/json")
                         .body(""),
@@ -299,9 +299,9 @@ async fn refresh_access_token_handler(req: HttpRequest, state: AppState) -> impl
     };
     let resp = match serde_json::to_string(&r) {
         Ok(json) => HttpResponse::Ok()
-            .cookie(access_cookie)
-            .cookie(refresh_cookie)
-            .cookie(xsrf_cookie)
+            .cookie(access_cookie.to_string())
+            .cookie(refresh_cookie.to_string())
+            .cookie(xsrf_cookie.to_string())
             .cookie(
                 Cookie::build("logged_in", json)
                     .domain(&state.config.host)
@@ -309,7 +309,7 @@ async fn refresh_access_token_handler(req: HttpRequest, state: AppState) -> impl
                     .secure(true)
                     .http_only(true)
                     .max_age(Duration::new(state.config.access_token_max_age * 60, 0))
-                    .finish(),
+                    .finish().to_string(),
             )
             .content_type("application/json")
             .body(""),
@@ -377,9 +377,9 @@ async fn logout_handler(
         .finish();
 
     HttpResponse::Ok()
-        .cookie(access_cookie)
-        .cookie(refresh_cookie)
-        .cookie(logged_in_cookie)
+        .cookie(access_cookie.to_string())
+        .cookie(refresh_cookie.to_string())
+        .cookie(logged_in_cookie.to_string())
         .json(&json!({"status": "success"}))
 }
 
